@@ -82,6 +82,10 @@ def split_sentence(sentence, min_length=10):
         sentences.append(current)
     return sentences
 
+def clean_markdown(text: str) -> str:
+    # 去掉 **加粗** 语法，保留中间内容
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    return text
 
 import asyncio
 async def gen_stream(prompt, asr = False, voice_speed=None, voice_id=None):
@@ -96,7 +100,8 @@ async def gen_stream(prompt, asr = False, voice_speed=None, voice_id=None):
     sentences = split_sentence(text_cache)
 
     for index_, sub_text in enumerate(sentences):
-        base64_string = await get_audio(sub_text, voice_speed, voice_id)
+
+        base64_string = await get_audio(clean_markdown(sub_text), voice_speed, voice_id)
         # 生成 JSON 格式的数据块
         chunk = {
             "text": sub_text,
