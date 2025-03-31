@@ -3,27 +3,59 @@ import requests
 import asyncio
 import re
 import base64
+import edge_tts
+import tempfile
+import os
+from pydub import AudioSegment
+
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request, UploadFile, File,HTTPException
 
-from web_demo.proxy.LlmProxy import query_chatbot
+from web_demo.proxy.LlmProxy import fetch_chat_response
 
 app = FastAPI()
 
 # 挂载静态文件
 app.mount("/static", StaticFiles(directory="web_demo/static"), name="static")
 
-def get_audio(text_cache, voice_speed, voice_id):
-    # 读取一个语音文件模拟语音合成的结果
-    with open("web_demo/static/common/test.wav", "rb") as audio_file:
+async def get_audio(text_cache, voice_speed, voice_id):
+    import edge_tts
+    import tempfile
+    import os
+    from pydub import AudioSegment
+
+    if voice_speed is None or voice_speed == "":
+        rate = "+0%"
+    elif int(voice_speed) >= 0:
+        rate = f"+{int(voice_speed)}%"
+    else:
+        rate = f"{int(voice_speed)}%"
+
+    voice = "zh-CN-XiaoxiaoNeural"
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_mp3:
+        mp3_path = tmp_mp3.name
+    wav_path = mp3_path.replace(".mp3", ".wav")
+
+    communicate = edge_tts.Communicate(text_cache, voice=voice, rate=rate)
+    await communicate.save(mp3_path)
+
+    # 转换为 WAV
+    sound = AudioSegment.from_file(mp3_path, format="mp3")
+    sound.export(wav_path, format="wav")
+
+    with open(wav_path, "rb") as audio_file:
         audio_value = audio_file.read()
-    base64_string = base64.b64encode(audio_value).decode('utf-8')
-    return base64_string
+
+    os.remove(mp3_path)
+    os.remove(wav_path)
+
+    return base64.b64encode(audio_value).decode("utf-8")
 
 def llm_answer(question):
     # 模拟大模型的回答
-    answer = query_chatbot(question)
+    answer = fetch_chat_response(question)
     print(answer)
     return answer
 
@@ -53,7 +85,7 @@ def split_sentence(sentence, min_length=10):
 
 import asyncio
 async def gen_stream(prompt, asr = False, voice_speed=None, voice_id=None):
-    print("XXXXXXXXX", voice_speed, voice_id)
+    print("gen_stream", voice_speed, voice_id)
     if asr:
         chunk = {
             "prompt": prompt
@@ -64,7 +96,7 @@ async def gen_stream(prompt, asr = False, voice_speed=None, voice_id=None):
     sentences = split_sentence(text_cache)
 
     for index_, sub_text in enumerate(sentences):
-        base64_string = get_audio(sub_text, voice_speed, voice_id)
+        base64_string = await get_audio(sub_text, voice_speed, voice_id)
         # 生成 JSON 格式的数据块
         chunk = {
             "text": sub_text,
