@@ -6,6 +6,9 @@ import base64
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request, UploadFile, File,HTTPException
+
+from web_demo.proxy.LlmProxy import query_chatbot
+
 app = FastAPI()
 
 # 挂载静态文件
@@ -18,9 +21,10 @@ def get_audio(text_cache, voice_speed, voice_id):
     base64_string = base64.b64encode(audio_value).decode('utf-8')
     return base64_string
 
-def llm_answer(prompt):
+def llm_answer(question):
     # 模拟大模型的回答
-    answer = "我会重复三遍来模仿大模型的回答，我会重复三遍来模仿大模型的回答，我会重复三遍来模仿大模型的回答。"
+    answer = query_chatbot(question)
+    print(answer)
     return answer
 
 def split_sentence(sentence, min_length=10):
@@ -101,6 +105,7 @@ async def eb_stream(request: Request):
             return StreamingResponse(gen_stream(prompt, asr=True, voice_speed=voice_speed, voice_id=voice_id), media_type="application/json")
         elif input_mode == "text":
             prompt = body.get("prompt")
+            print("User text input: " + prompt)
             return StreamingResponse(gen_stream(prompt, asr=False, voice_speed=voice_speed, voice_id=voice_id), media_type="application/json")
         else:
             raise HTTPException(status_code=400, detail="Invalid input mode")
@@ -110,4 +115,4 @@ async def eb_stream(request: Request):
 # 启动Uvicorn服务器
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8888)
+    uvicorn.run(app, host="0.0.0.0", port=8898)

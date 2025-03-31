@@ -6,3 +6,5 @@ pyglm
 glfw
 PyOpenGL
 gradio
+edge-tts
+pydub

@@ -34,7 +34,7 @@ class RenderModel:
         source_channel = 6
         ref_channel = n_ref * 6
         self.__net = DINet(source_channel, ref_channel).to(device)
-        checkpoint = torch.load(ckpt_path)
+        checkpoint = torch.load(ckpt_path, map_location="cpu")
         self.__net.load_state_dict(checkpoint)
         self.__net.eval()
 

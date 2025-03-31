@@ -58,7 +58,7 @@ def launch_server():
     # 启动 server.py
     subprocess.Popen(["python", "web_demo/server.py"])
 
-    return "访问 http://localhost:8888/static/MiniLive_new.html"
+    return "访问 http://localhost:8898/static/MiniLive_new.html"
 
 # 定义 Gradio 界面
 def create_interface():
@@ -172,4 +172,4 @@ def create_interface():
 # 创建 Gradio 界面并启动
 if __name__ == "__main__":
     demo = create_interface()
-    demo.launch()
+    demo.launch(server_port=9008)

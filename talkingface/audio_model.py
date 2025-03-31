@@ -43,7 +43,7 @@ class AudioModel:
         #     Audio2FeatureModel.eval()
         from talkingface.models.audio2bs_lstm import Audio2Feature
         self.__net = Audio2Feature()  # 调用模型Model
-        self.__net.load_state_dict(torch.load(ckpt_path))
+        self.__net.load_state_dict(torch.load(ckpt_path, map_location="cpu"))
         self.__net = self.__net.to(device)
         self.__net.eval()
 

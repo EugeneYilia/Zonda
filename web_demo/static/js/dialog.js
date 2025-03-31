@@ -1,4 +1,4 @@
-let server_url = "http://localhost:8888/eb_stream"
+let server_url = "http://localhost:8898/eb_stream"
 let audioQueue = []; // 存储待播放的音频数据
 let isPlaying = false; // 标记是否正在播放音频
 let audioContext; // 定义在全局以便在用户交互后创建或恢复
