@@ -12,7 +12,7 @@
 │   ├── js/                  # JavaScript脚本文件夹
 │   ├── DHLiveMini.wasm      # AI推理组件
 │   ├── dialog.html          # 对话页面
-│   └── MiniLive.html        # 数字人视频流主页面
+│   └── Eugene.html        # 数字人视频流主页面
 └── server.py                # 启动网页服务的Python程序
 ```
 ### 运行项目
