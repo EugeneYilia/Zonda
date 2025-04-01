@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request, UploadFile, File,HTTPException
 
 from web_demo.proxy.LlmProxy import fetch_chat_response
+from web_demo.tils.MDUtils import clean_markdown
 
 app = FastAPI()
 
@@ -27,6 +28,7 @@ async def get_audio(text_cache, voice_speed, voice_id):
 
     if voice_speed is None or voice_speed == "":
         rate = "+0%"
+        # rate = "-50%"
     elif int(voice_speed) >= 0:
         rate = f"+{int(voice_speed)}%"
     else:
@@ -43,6 +45,7 @@ async def get_audio(text_cache, voice_speed, voice_id):
 
     # 转换为 WAV
     sound = AudioSegment.from_file(mp3_path, format="mp3")
+    sound = sound.set_frame_rate(16000).set_channels(1)
     sound.export(wav_path, format="wav")
 
     with open(wav_path, "rb") as audio_file:
@@ -81,11 +84,6 @@ def split_sentence(sentence, min_length=10):
     if len(current) >= 2:
         sentences.append(current)
     return sentences
-
-def clean_markdown(text: str) -> str:
-    # 去掉 **加粗** 语法，保留中间内容
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
-    return text
 
 import asyncio
 async def gen_stream(prompt, asr = False, voice_speed=None, voice_id=None):
