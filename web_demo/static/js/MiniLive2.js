@@ -401,7 +401,7 @@ async function init_gl() {
             gl.activeTexture(gl.TEXTURE0);
             gl.uniform1i(gl.getUniformLocation(program, 'texture_bs'), 0);
         };
-        image.src = 'common/bs_texture_halfFace.png';
+        image.src = 'common/transparent.png';
 }
 async function setupVertsBuffers() {
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
