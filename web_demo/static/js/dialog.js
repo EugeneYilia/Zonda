@@ -137,8 +137,11 @@ textInput.addEventListener('keypress', (e) => {
     }
 });
 
-// 添加消息到聊天记录
+let lastMessageContent = null;  // 用于记录最后那条 message-content 的引用
+
 function addMessage(message, isUser, isNew) {
+    const container = isUser ? document.getElementById('right-chat') : document.getElementById('left-chat');
+
     if (isNew) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
@@ -146,13 +149,18 @@ function addMessage(message, isUser, isNew) {
         messageElement.innerHTML = `
             <div class="message-content">${message}</div>
         `;
-        chatContainer.appendChild(messageElement);
+        container.appendChild(messageElement);
+
+        // 保存这条新消息的内容 DOM 引用
+        lastMessageContent = messageElement.querySelector('.message-content');
     } else {
-        // 直接操作 innerHTML 或使用 append 方法
-        const lastMessageContent = chatContainer.lastElementChild.querySelector('.message-content');
-        lastMessageContent.innerHTML += message;
+        if (lastMessageContent) {
+            lastMessageContent.innerHTML += message;
+        }
     }
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // 自动滚动到底部（对话流更新）
+    container.scrollTop = container.scrollHeight;
 }
 
 // 初始设置为语音模式
