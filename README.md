@@ -81,10 +81,9 @@ python demo_mini.py video_data/000002/assets video_data/audio0.wav 1.mp4
 python web_demo/server.py
 ```
 可以打开 localhost:8888/static/MiniLive.html。
+
 ## License
-DH_live is licensed under the MIT License.
+DigitalHuman is licensed under the MIT License.
 
 ## 联系
-|  加我好友，请备注“进群”，拉你进去微信交流群。| 进入QQ群聊，分享看法和最新咨询。 |
-|-------------------|----------------------|
-| ![微信交流群](https://github.com/user-attachments/assets/b1f24ebb-153b-44b1-b522-14f765154110) | ![QQ群聊](https://github.com/user-attachments/assets/29bfef3f-438a-4b9f-ba09-e1926d1669cb) |
+微信Wechat: MensaEugene
