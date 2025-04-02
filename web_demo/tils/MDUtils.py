@@ -17,9 +17,9 @@ def clean_markdown(text: str) -> str:
     text = re.sub(r'\*\*\*(.*?)\*\*\*', r'\1', text)
     text = re.sub(r'___(.*?)___', r'\1', text)
 
-    # 去掉加粗语法 **text** 或 __text__，兼容句尾标点
-    text = re.sub(r'\*\*(.+?)\*\*(?=[\u4e00-\u9fa5\w\s]*[，。！？,.!?:;」」））”"\']*)', r'\1', text)
-    text = re.sub(r'__(.+?)__(?=[\u4e00-\u9fa5\w\s]*[，。！？,.!?:;」」））”"\']*)', r'\1', text)
+    # ✅ 彻底清除加粗标记（**text** 和 __text__），无论结尾是标点、括号还是中文
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    text = re.sub(r'__(.*?)__', r'\1', text)
 
     # 去掉斜体 *text* 和 _text_，避免破坏乘号 *
     text = re.sub(r'(?<!\*)\*(?!\*)(.+?)\*(?!\*)', r'\1', text)
