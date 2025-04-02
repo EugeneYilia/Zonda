@@ -1,5 +1,6 @@
 import re
 
+
 def clean_markdown(text: str) -> str:
     # 去除代码块（```代码```）
     text = re.sub(r'```[\s\S]*?```', '', text)

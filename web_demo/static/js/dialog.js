@@ -84,7 +84,7 @@ voiceInputArea.addEventListener('click', async () => {
                         alert('录音时间过短');
                         audioChunks = []; // 清除录音数据
                     } else {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioBlob = new Blob(audioChunks, {type: 'audio/wav'});
                         audioChunks = [];
                         sendAudioMessage(audioBlob); // 直接发送 Blob 数据
                     }
@@ -119,10 +119,10 @@ voiceInputArea.addEventListener('click', async () => {
 // 获取媒体流（兼容性处理）
 async function getMediaStream() {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        return await navigator.mediaDevices.getUserMedia({ audio: true });
+        return await navigator.mediaDevices.getUserMedia({audio: true});
     } else if (navigator.getUserMedia) { // 旧版API
         return new Promise((resolve, reject) => {
-            navigator.getUserMedia({ audio: true }, resolve, reject);
+            navigator.getUserMedia({audio: true}, resolve, reject);
         });
     } else {
         throw new Error('您的浏览器不支持录音功能');
@@ -197,20 +197,26 @@ function sendTextMessage() {
         }
         fetch(server_url, {
             method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({"input_mode": "text", 'prompt': inputValue, 'voice_id': characterName, 'voice_speed': "" }),
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                "input_mode": "text",
+                'prompt': inputValue,
+                'voice_id': characterName,
+                'voice_speed': ""
+            }),
             signal: controller.signal
         })
             .then(response => response.body)
             .then(body => {
                 const reader = body.getReader();
                 const decoder = new TextDecoder();
+
                 function read() {
-                    return reader.read().then(({ done, value }) => {
+                    return reader.read().then(({done, value}) => {
                         if (done) {
                             return;
                         }
-                        const chunk = decoder.decode(value, { stream: true });
+                        const chunk = decoder.decode(value, {stream: true});
                         buffer += chunk; // 将新数据追加到缓存区
 
                         // 根据换行符拆分缓存区中的数据
@@ -239,6 +245,7 @@ function sendTextMessage() {
                         return read();
                     });
                 }
+
                 return read();
             })
             .catch(error => {
@@ -269,7 +276,7 @@ function sendAudioMessage(audioBlob) {
     } else if (audioContext.state === 'suspended') {
         audioContext.resume(); // 如果处于暂停状态，则恢复
     }
-    reader.onloadend = function() {
+    reader.onloadend = function () {
         const base64Audio = reader.result.split(',')[1]; // 去掉 data URL 前缀
 
         // 获取音色名称
@@ -280,82 +287,79 @@ function sendAudioMessage(audioBlob) {
         }
 
         const requestData = {
-            input_mode: "audio",
-            audio: base64Audio,
-            voice_speed: "", // 可以根据需要调整
+            input_mode: "audio", audio: base64Audio, voice_speed: "", // 可以根据需要调整
             voice_id: characterName // 可以根据需要调整
         };
 
         fetch(server_url, {
-            method: 'POST',
-            headers: {
+            method: 'POST', headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData),
-            signal: controller.signal,
+            }, body: JSON.stringify(requestData), signal: controller.signal,
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('网络响应错误');
-            }
-            return response.body;
-        })
-        .then(body => {
-            const reader = body.getReader();
-            const decoder = new TextDecoder();
-            function read() {
-                return reader.read().then(({ done, value }) => {
-                    if (done) {
-                        console.log('数据流读取完成');
-                        return;
-                    }
-                    const chunk = decoder.decode(value, { stream: true });
-                    buffer += chunk; // 将新数据追加到缓存区
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应错误');
+                }
+                return response.body;
+            })
+            .then(body => {
+                const reader = body.getReader();
+                const decoder = new TextDecoder();
 
-                    // 根据换行符拆分缓存区中的数据
-                    const chunks = buffer.split("\n");
-
-                    // 处理完整的 JSON 块
-                    for (let i = 0; i < chunks.length - 1; i++) {
-                        try {
-                            const data = JSON.parse(chunks[i]);
-                            // 如果data中包含key:prompt,那就解析出来
-                            if (data.prompt) {
-                                console.log("SSSSSS prompt", data.prompt);
-                                addMessage(data.prompt, true, true); // 添加文本消息
-                                continue;
-                            }
-                            console.log("Received text:", data.text, isNewChat);
-                            console.log("Received audio (Base64):", data.audio.length);
-                            addMessage(data.text, false, isNewChat); // 添加文本消息
-                            isNewChat = false;
-
-                            // 将 Base64 音频数据转换为 Uint8Array
-                            const audioUint8Array = base64ToUint8Array(data.audio);
-                            audioQueue.push(audioUint8Array); // 将 Uint8Array 推入队列
-                            isEnding = data.endpoint;
-
-                            playAudio(); // 播放音频
-                        } catch (error) {
-                            console.error("Error parsing chunk:", error);
+                function read() {
+                    return reader.read().then(({done, value}) => {
+                        if (done) {
+                            console.log('数据流读取完成');
+                            return;
                         }
-                    }
+                        const chunk = decoder.decode(value, {stream: true});
+                        buffer += chunk; // 将新数据追加到缓存区
 
-                    // 将最后一个不完整的块保留在缓存区中
-                    buffer = chunks[chunks.length - 1];
+                        // 根据换行符拆分缓存区中的数据
+                        const chunks = buffer.split("\n");
 
-                    return read();
-                });
-            }
-            return read();
-        })
-        .catch(error => {
-            if (error.name === 'AbortError') {
-                console.log('请求被中断');
-            } else {
-                console.error('请求错误:', error);
-            }
-        });
+                        // 处理完整的 JSON 块
+                        for (let i = 0; i < chunks.length - 1; i++) {
+                            try {
+                                const data = JSON.parse(chunks[i]);
+                                // 如果data中包含key:prompt,那就解析出来
+                                if (data.prompt) {
+                                    console.log("SSSSSS prompt", data.prompt);
+                                    addMessage(data.prompt, true, true); // 添加文本消息
+                                    continue;
+                                }
+                                console.log("Received text:", data.text, isNewChat);
+                                console.log("Received audio (Base64):", data.audio.length);
+                                addMessage(data.text, false, isNewChat); // 添加文本消息
+                                isNewChat = false;
+
+                                // 将 Base64 音频数据转换为 Uint8Array
+                                const audioUint8Array = base64ToUint8Array(data.audio);
+                                audioQueue.push(audioUint8Array); // 将 Uint8Array 推入队列
+                                isEnding = data.endpoint;
+
+                                playAudio(); // 播放音频
+                            } catch (error) {
+                                console.error("Error parsing chunk:", error);
+                            }
+                        }
+
+                        // 将最后一个不完整的块保留在缓存区中
+                        buffer = chunks[chunks.length - 1];
+
+                        return read();
+                    });
+                }
+
+                return read();
+            })
+            .catch(error => {
+                if (error.name === 'AbortError') {
+                    console.log('请求被中断');
+                } else {
+                    console.error('请求错误:', error);
+                }
+            });
     };
 }
 
@@ -402,7 +406,7 @@ function playAudio() {
             // 将 Uint8Array 转换为 ArrayBuffer
             const arrayBuffer2 = arrayBuffer.buffer;
             // 解码ArrayBuffer为AudioBuffer
-            audioContext.decodeAudioData(arrayBuffer2, function(audioBuffer) {
+            audioContext.decodeAudioData(arrayBuffer2, function (audioBuffer) {
                 // 创建BufferSource节点
                 const source = audioContext.createBufferSource();
                 source.buffer = audioBuffer;
@@ -410,12 +414,12 @@ function playAudio() {
                 source.connect(audioContext.destination);
                 source.start(0);
                 // 当音频播放结束时释放资源
-                source.onended = function() {
+                source.onended = function () {
                     isPlaying = false;
                     playAudio();
                     // audioContext.close();
                 };
-            }, function(error) {
+            }, function (error) {
                 console.error('Decode audio error', error);
             });
         } else {

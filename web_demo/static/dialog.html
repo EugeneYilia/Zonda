@@ -2,69 +2,70 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>AI聊天</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         html, body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          margin: 0;
-          padding: 0;
-          height: 100%;
-          overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
         }
 
         .top-area {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 70px; /* 留出输入区域 */
-          overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 70px; /* 留出输入区域 */
+            overflow: hidden;
         }
 
         .chat-container {
-          position: absolute;
-          top: 60%;
-          bottom: 70px;
-          left: 0;
-          width: 100%;
-          max-width: 100%;               /* ✅ 防止撑宽 */
-          box-sizing: border-box;        /* ✅ 防止 padding 撑爆 */
-          overflow-x: hidden;            /* ✅ 不要横向滚动 */
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          overflow-y: auto;
-          pointer-events: none;
-          padding: 0 20px;
+            position: absolute;
+            top: 60%;
+            bottom: 70px;
+            left: 0;
+            width: 100%;
+            max-width: 100%; /* ✅ 防止撑宽 */
+            box-sizing: border-box; /* ✅ 防止 padding 撑爆 */
+            overflow-x: hidden; /* ✅ 不要横向滚动 */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            pointer-events: none;
+            padding: 0 20px;
         }
 
         .message-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          width: 100%;
-          max-width: 100%;               /* ✅ 防止撑宽 */
-          box-sizing: border-box;        /* ✅ 避免 margin 计算错 */
-          pointer-events: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 100%; /* ✅ 防止撑宽 */
+            box-sizing: border-box; /* ✅ 避免 margin 计算错 */
+            pointer-events: auto;
         }
 
         .message {
-          max-width: 45%;
-          padding: 10px 14px;
-          border-radius: 10px;
-          font-size: 14px;
-          line-height: 1.5;
-          background-color: rgba(255,255,255,0.85);
-          word-break: break-word;
+            max-width: 45%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: rgba(255, 255, 255, 0.85);
+            word-break: break-word;
         }
 
         .message.user {
-            background-color: rgba(0,123,255,0.85);
+            background-color: rgba(0, 123, 255, 0.85);
             color: white;
             margin-right: 10px;
         }
+
         .message.ai {
             background-color: rgba(240, 240, 240, 0.9);
             color: #000;
@@ -72,21 +73,22 @@
         }
 
         .message.ai::before {
-          content: "🤖";
-          margin-right: 6px;
+            content: "🤖";
+            margin-right: 6px;
         }
+
         .message.user::before {
-          content: "🧑";
-          margin-right: 6px;
+            content: "🧑";
+            margin-right: 6px;
         }
 
         .input-container {
-          position: absolute;
-          bottom: 0;
-          height: 70px;
-          width: 100%;
-          background-color: #fff;
-          z-index: 10;
+            position: absolute;
+            bottom: 0;
+            height: 70px;
+            width: 100%;
+            background-color: #fff;
+            z-index: 10;
         }
 
         .input-area {
@@ -142,33 +144,33 @@
     </style>
 </head>
 <body>
-    <!-- 上半区域 -->
-    <div class="top-area"></div>
+<!-- 上半区域 -->
+<div class="top-area"></div>
 
-    <!-- 聊天容器 -->
-    <div class="chat-container">
-      <div class="message-row">
+<!-- 聊天容器 -->
+<div class="chat-container">
+    <div class="message-row">
         <div class="message ai">AI 内容</div>
         <div class="message user">用户内容</div>
-      </div>
     </div>
+</div>
 
 
-    <!-- 输入区域 -->
-    <div class="input-container">
-        <div class="input-area" id="input-area">
-            <button class="input-toggle" id="toggle-button">
-                <i class="fas fa-keyboard"></i>
-            </button>
-            <div class="voice-input-area" id="voice-input-area">
-                <span>点击说话</span>
-            </div>
-            <input type="text" id="text-input" placeholder="发送消息" style="display: none;">
-            <button class="send-button" id="send-button" style="display: none;">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+<!-- 输入区域 -->
+<div class="input-container">
+    <div class="input-area" id="input-area">
+        <button class="input-toggle" id="toggle-button">
+            <i class="fas fa-keyboard"></i>
+        </button>
+        <div class="voice-input-area" id="voice-input-area">
+            <span>点击说话</span>
         </div>
+        <input id="text-input" placeholder="发送消息" style="display: none;" type="text">
+        <button class="send-button" id="send-button" style="display: none;">
+            <i class="fas fa-paper-plane"></i>
+        </button>
     </div>
-    <script src="js/dialog.js"></script>
+</div>
+<script src="js/dialog.js"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 let fps_enabled = true; // 全局参数，控制是否显示FPS
 let frameTimes = []; // 用于存储最近几帧的时间戳
 let ctxEl = canvasEl.getContext("2d");
+
 class VideoProcessor {
     constructor() {
         this.mp4box = MP4Box.createFile();
@@ -51,7 +52,7 @@ class VideoProcessor {
         // 从服务器加载 Gzip 压缩的 JSON 文件
         const response = await fetch(gzipUrl);
         const compressedData = await response.arrayBuffer();
-        const decompressedData = pako.inflate(new Uint8Array(compressedData), { to: 'string' });
+        const decompressedData = pako.inflate(new Uint8Array(compressedData), {to: 'string'});
         this.combinedData = JSON.parse(decompressedData);
     }
 
@@ -60,8 +61,8 @@ class VideoProcessor {
         this.videoTrack = info.videoTracks[0];
         if (!this.videoTrack) return;
 
-        this.mp4box.setExtractionOptions(this.videoTrack.id, 'video', { nbSamples: 100 });
-        const { track_width: videoW, track_height: videoH } = this.videoTrack;
+        this.mp4box.setExtractionOptions(this.videoTrack.id, 'video', {nbSamples: 100});
+        const {track_width: videoW, track_height: videoH} = this.videoTrack;
 
         // 假设canvas_video已在外部定义
         canvas_video.width = videoW;
@@ -71,16 +72,12 @@ class VideoProcessor {
         canvasEl.height = videoH;
 
         this.videoDecoder = new VideoDecoder({
-            output: this.handleVideoFrame.bind(this),
-            error: (e) => console.error("VideoDecoder error:", e)
+            output: this.handleVideoFrame.bind(this), error: (e) => console.error("VideoDecoder error:", e)
         });
 
         this.nbSampleTotal = this.videoTrack.nb_samples;
         this.videoDecoder.configure({
-            codec: this.videoTrack.codec,
-            codedWidth: videoW,
-            codedHeight: videoH,
-            description: this.getExtradata()
+            codec: this.videoTrack.codec, codedWidth: videoW, codedHeight: videoH, description: this.getExtradata()
         });
 
         this.mp4box.start();
@@ -89,9 +86,7 @@ class VideoProcessor {
     handleVideoFrame(videoFrame) {
         createImageBitmap(videoFrame).then(img => {
             this.videoFrames.push({
-                img,
-                duration: videoFrame.duration,
-                timestamp: videoFrame.timestamp
+                img, duration: videoFrame.duration, timestamp: videoFrame.timestamp
             });
             ctxEl.clearRect(0, 0, canvasEl.width, canvasEl.height);
             ctxEl.drawImage(img, 0, 0, canvasEl.width, canvasEl.height);
@@ -137,6 +132,7 @@ class VideoProcessor {
         box.write(stream);
         return new Uint8Array(stream.buffer.slice(8));
     }
+
     sortVideoFrames() {
         this.videoFrames.sort((a, b) => a.timestamp - b.timestamp);
     }
@@ -149,11 +145,11 @@ const characterDropdown = document.getElementById('characterDropdown');
 
 // 检查元素是否存在
 if (characterDropdown) {
-    characterDropdown.addEventListener('change', async function() {
+    characterDropdown.addEventListener('change', async function () {
         isPaused = true;
         document.getElementById('startMessage').style.display = 'block';
         asset_dir = this.value;
-        console.log('Selected character:', asset_dir); 
+        console.log('Selected character:', asset_dir);
         await videoProcessor.init(asset_dir + "/01.mp4", asset_dir + "/combined_data.json.gz");
         await loadCombinedData();
         await setupVertsBuffers();
@@ -173,7 +169,7 @@ let lastFrameTime = performance.now();
 
 // 原始webgl渲染
 const canvas_gl = document.getElementById('canvas_gl');
-const gl = canvas_gl.getContext('webgl2', { antialias: false });
+const gl = canvas_gl.getContext('webgl2', {antialias: false});
 
 // 最终显示的画布
 const canvas_video = document.getElementById('canvas_video');
@@ -181,7 +177,7 @@ const ctx_video = canvas_video.getContext('2d');
 
 // 缩放到128x128
 const resizedCanvas = document.createElement('canvas');
-const resizedCtx = resizedCanvas.getContext('2d', { willReadFrequently: true });
+const resizedCtx = resizedCanvas.getContext('2d', {willReadFrequently: true});
 resizedCanvas.width = 128;
 resizedCanvas.height = 128;
 
@@ -214,8 +210,7 @@ function parseObjFile(text) {
     lines.forEach(line => {
         const parts = line.trim().split(/\s+/);
         if (parts[0] === 'v') {
-            vertices.push(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3]),
-                parseFloat(parts[4]), parseFloat(parts[5]));
+            vertices.push(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3]), parseFloat(parts[4]), parseFloat(parts[5]));
         } else if (parts[0] === 'f') {
             const face = parts.slice(1).map(part => {
                 const indices = part.split('/').map(index => parseInt(index, 10) - 1);
@@ -225,12 +220,12 @@ function parseObjFile(text) {
         }
     });
 
-    return { vertices, faces };
+    return {vertices, faces};
 }
 
 async function loadCombinedData() {
     try {
-        let { json_data, ...WasmInputJson } = videoProcessor.combinedData;
+        let {json_data, ...WasmInputJson} = videoProcessor.combinedData;
 
         let jsonString = JSON.stringify(WasmInputJson);
         // 分配内存
@@ -240,6 +235,7 @@ async function loadCombinedData() {
             const encoded = encoder.encode(str);
             return encoded.length + 1; // +1 是为了包含 null 终止符
         }
+
         let lengthBytes = getUTF8Length(jsonString);
 
         let stringPointer = Module._malloc(lengthBytes);
@@ -272,8 +268,8 @@ async function loadCombinedData() {
 
 
 async function init_gl() {
-        // WebGL Shaders
-        const vertexShaderSource = `#version 300 es
+    // WebGL Shaders
+    const vertexShaderSource = `#version 300 es
             layout(location = 0) in vec3 a_position;
             layout(location = 1) in vec2 a_texture;
             uniform float bsVec[12];
@@ -329,7 +325,7 @@ async function init_gl() {
             }
         `;
 
-        const fragmentShaderSource = `#version 300 es
+    const fragmentShaderSource = `#version 300 es
             precision mediump float;
             in mediump vec2 v_texture;
             in mediump vec2 v_bias;
@@ -358,54 +354,55 @@ async function init_gl() {
             }
         `;
 
-        // Compile shaders and link program
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexShaderSource);
-        gl.compileShader(vertexShader);
+    // Compile shaders and link program
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertexShaderSource);
+    gl.compileShader(vertexShader);
 
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentShaderSource);
-        gl.compileShader(fragmentShader);
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragmentShaderSource);
+    gl.compileShader(fragmentShader);
 
-        program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        gl.useProgram(program);
+    program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    gl.useProgram(program);
 
-        // Set up vertex data
-        positionBuffer = gl.createBuffer();
+    // Set up vertex data
+    positionBuffer = gl.createBuffer();
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objData.vertices), gl.STATIC_DRAW);
-        gl.enableVertexAttribArray(0);
-        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 20, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objData.vertices), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 20, 0);
 
-        gl.enableVertexAttribArray(1);
-        gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 20, 12);
+    gl.enableVertexAttribArray(1);
+    gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 20, 12);
 
-        indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(objData.faces), gl.STATIC_DRAW);
+    indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(objData.faces), gl.STATIC_DRAW);
 
-        var image = new Image();
-        image.onload = function () {
-            gl.bindTexture(gl.TEXTURE_2D, texture_bs);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    var image = new Image();
+    image.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, texture_bs);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 //            gl.bindTexture(gl.TEXTURE_2D, null);
 
-            gl.activeTexture(gl.TEXTURE0);
-            gl.uniform1i(gl.getUniformLocation(program, 'texture_bs'), 0);
-        };
-        image.src = 'common/bs_texture_halfFace.png';
+        gl.activeTexture(gl.TEXTURE0);
+        gl.uniform1i(gl.getUniformLocation(program, 'texture_bs'), 0);
+    };
+    image.src = 'common/bs_texture_halfFace.png';
 }
+
 async function setupVertsBuffers() {
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objData.vertices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objData.vertices), gl.STATIC_DRAW);
 }
 
 async function newVideoTask() {
@@ -420,48 +417,47 @@ async function newVideoTask() {
     document.getElementById('startMessage').style.display = 'none';
 }
 
-function cerateOrthoMatrix()
-{
+function cerateOrthoMatrix() {
     const orthoMatrix = new Float32Array(16);
 
 // 定义正交投影参数
-const left = 0;
-const right = 128;
-const bottom = 0;
-const top = 128;
-const near = 1000;
-const far = -1000;
+    const left = 0;
+    const right = 128;
+    const bottom = 0;
+    const top = 128;
+    const near = 1000;
+    const far = -1000;
 
 // 计算各轴跨度
-const rl = right - left;    // 128
-const tb = top - bottom;    // 128
-const fn = far - near;      // -2000
+    const rl = right - left;    // 128
+    const tb = top - bottom;    // 128
+    const fn = far - near;      // -2000
 
 // 列主序填充正交投影矩阵
 // 第一列 (x)
-orthoMatrix[0] = 2 / rl;    // 2/128 = 0.015625
-orthoMatrix[1] = 0;
-orthoMatrix[2] = 0;
-orthoMatrix[3] = 0;
+    orthoMatrix[0] = 2 / rl;    // 2/128 = 0.015625
+    orthoMatrix[1] = 0;
+    orthoMatrix[2] = 0;
+    orthoMatrix[3] = 0;
 
 // 第二列 (y)
-orthoMatrix[4] = 0;
-orthoMatrix[5] = 2 / tb;    // 2/128 = 0.015625
-orthoMatrix[6] = 0;
-orthoMatrix[7] = 0;
+    orthoMatrix[4] = 0;
+    orthoMatrix[5] = 2 / tb;    // 2/128 = 0.015625
+    orthoMatrix[6] = 0;
+    orthoMatrix[7] = 0;
 
 // 第三列 (z)
-orthoMatrix[8] = 0;
-orthoMatrix[9] = 0;
-orthoMatrix[10] = -2 / fn;  // -2/-2000 = 0.001
-orthoMatrix[11] = 0;
+    orthoMatrix[8] = 0;
+    orthoMatrix[9] = 0;
+    orthoMatrix[10] = -2 / fn;  // -2/-2000 = 0.001
+    orthoMatrix[11] = 0;
 
 // 第四列 (平移)
-orthoMatrix[12] = -(right + left) / rl;  // -128/128 = -1
-orthoMatrix[13] = -(top + bottom) / tb;  // -128/128 = -1
-orthoMatrix[14] = -(far + near) / fn;    // -(-1000+1000)/-2000 = 0
-orthoMatrix[15] = 1;
-return orthoMatrix;
+    orthoMatrix[12] = -(right + left) / rl;  // -128/128 = -1
+    orthoMatrix[13] = -(top + bottom) / tb;  // -128/128 = -1
+    orthoMatrix[14] = -(far + near) / fn;    // -(-1000+1000)/-2000 = 0
+    orthoMatrix[15] = 1;
+    return orthoMatrix;
 }
 
 function render(mat_world, subPoints, bsArray) {
@@ -500,7 +496,6 @@ function render(mat_world, subPoints, bsArray) {
 }
 
 
-
 async function processVideoFrames() {
     if (isPaused) {
         // 如果暂停，直接返回，不处理帧
@@ -515,7 +510,7 @@ async function processVideoFrames() {
     if (frameIndex >= videoProcessor.videoFrames.length) {
         frameIndex = 0; // 重新开始
     }
-    const { img, duration, timestamp } = videoProcessor.videoFrames[frameIndex];
+    const {img, duration, timestamp} = videoProcessor.videoFrames[frameIndex];
     ctx_video.drawImage(img, 0, 0, canvas_video.width, canvas_video.height);
 
     // 计算并显示FPS
@@ -552,6 +547,7 @@ async function initMemory() {
     imageDataGlPtr = Module._malloc(imageDataSize);
     bsPtr = Module._malloc(12 * 4); // 12 floats for blend shape
 }
+
 async function processDataSet(currentDataSetIndex) {
     if (isPaused) {
         // 如果暂停，直接返回，不处理帧
