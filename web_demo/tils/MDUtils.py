@@ -32,6 +32,13 @@ def clean_markdown(text: str) -> str:
     # 去掉无序列表符号 *, -, +
     text = re.sub(r'^[\*\-\+]\s+', '', text, flags=re.MULTILINE)
 
+    # 去除斜体语法 *text* 或 _text_
+    text = re.sub(r'\*(.*?)\*', r'\1', text)  # 更宽松，处理 *text*
+    text = re.sub(r'_(.*?)_', r'\1', text)
+
+    # 去掉所有孤立的星号（非代码/强调用途的残留 *）
+    text = re.sub(r'(?<!\S)\*(?!\S)', '', text)  # 删除独立星号（空格包围的 *）
+
     # 去掉多余空行和前后空白
     text = re.sub(r'\n{2,}', '\n', text)
     text = text.strip()
