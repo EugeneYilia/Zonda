@@ -94,7 +94,7 @@ class VideoProcessor {
                 timestamp: videoFrame.timestamp
             });
             ctxEl.clearRect(0, 0, canvasEl.width, canvasEl.height);
-            ctxEl.drawImage(img, 0, 0, canvasEl.width, canvasEl.height);
+            // ctxEl.drawImage(img, 0, 0, canvasEl.width, canvasEl.height);
             videoFrame.close();
 
             // 添加逆序帧逻辑
@@ -401,7 +401,7 @@ async function init_gl() {
             gl.activeTexture(gl.TEXTURE0);
             gl.uniform1i(gl.getUniformLocation(program, 'texture_bs'), 0);
         };
-        image.src = 'common/bs_texture_halfFace.png';
+        image.src = 'common/transparent.png';
 }
 async function setupVertsBuffers() {
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -571,7 +571,7 @@ async function processDataSet(currentDataSetIndex) {
 
     render(matrix, subPoints, bsArray);
     // console.log("bsArray", bsArray);
-    resizedCtx.drawImage(canvas_video, rect[0], rect[1], rect[2] - rect[0], rect[3] - rect[1], 0, 0, 128, 128);
+    // resizedCtx.drawImage(canvas_video, rect[0], rect[1], rect[2] - rect[0], rect[3] - rect[1], 0, 0, 128, 128);
 
     const imageData = resizedCtx.getImageData(0, 0, 128, 128);
     Module.HEAPU8.set(imageData.data, imageDataPtr);
