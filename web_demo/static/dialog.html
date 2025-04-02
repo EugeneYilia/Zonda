@@ -28,53 +28,46 @@
           left: 0;
           width: 100%;
           display: flex;
-          justify-content: space-between;
-          padding: 0 40px;
+          flex-direction: column;
+          gap: 10px;
+          padding: 0 30px;
           pointer-events: none;
         }
 
-        .left-chat, .right-chat {
+        .message-row {
           display: flex;
-          flex-direction: column;
-          max-width: 20%;
-          gap: 10px;
+          justify-content: space-between;
+          align-items: flex-start;
+          width: 100%;
           pointer-events: auto;
         }
 
         .message {
-          background-color: rgba(255, 255, 255, 0.8);
-          color: #000;
-          padding: 8px 12px;
+          max-width: 45%;
+          padding: 10px 14px;
           border-radius: 10px;
           font-size: 14px;
-          line-height: 1.4;
-          word-wrap: break-word;
-        }
-
-        .message.ai {
-            justify-content: flex-start;
+          line-height: 1.5;
+          background-color: rgba(255,255,255,0.85);
+          word-break: break-word;
         }
 
         .message.user {
-            justify-content: flex-end;
+          background-color: rgba(0,123,255,0.85);
+          color: white;
+        }
+        .message.ai {
+          background-color: rgba(240, 240, 240, 0.9);
+          color: #000;
         }
 
-        .message-content {
-            font-size: 14px;
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 15px;
-            position: relative;
+        .message.ai::before {
+          content: "🤖";
+          margin-right: 6px;
         }
-
-        .message.ai .message-content {
-            background-color: rgba(224, 224, 224, 0.8);  /* 灰色80%不透明 */
-            color: #333;
-        }
-
-        .message.user .message-content {
-            background-color: rgba(0, 123, 255, 0.8);    /* 蓝色80%不透明 */
-            color: #fff;
+        .message.user::before {
+          content: "🧑";
+          margin-right: 6px;
         }
 
         .input-container {
@@ -142,11 +135,13 @@
     <div class="top-area"></div>
 
     <!-- 聊天容器 -->
-    <div class="chat-container" id="chat-container">
-        <!-- 聊天记录将显示在这里 -->
-        <div class="left-chat" id="left-chat"></div>
-        <div class="right-chat" id="right-chat"></div>
+    <div class="chat-container">
+      <div class="message-row">
+        <div class="message ai">AI 内容</div>
+        <div class="message user">用户内容</div>
+      </div>
     </div>
+
 
     <!-- 输入区域 -->
     <div class="input-container">

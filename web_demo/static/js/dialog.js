@@ -137,31 +137,33 @@ textInput.addEventListener('keypress', (e) => {
     }
 });
 
-let lastMessageContent = null;  // 用于记录最后那条 message-content 的引用
+let currentRow = null;
 
 function addMessage(message, isUser, isNew) {
-    const container = isUser ? document.getElementById('right-chat') : document.getElementById('left-chat');
-
     if (isNew) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.classList.add(isUser ? 'user' : 'ai');
-        messageElement.innerHTML = `
-            <div class="message-content">${message}</div>
-        `;
-        container.appendChild(messageElement);
+        currentRow = document.createElement('div');
+        currentRow.className = 'message-row';
 
-        // 保存这条新消息的内容 DOM 引用
-        lastMessageContent = messageElement.querySelector('.message-content');
-    } else {
-        if (lastMessageContent) {
-            lastMessageContent.innerHTML += message;
+        const bubble = document.createElement('div');
+        bubble.className = `message ${isUser ? 'user' : 'ai'}`;
+        bubble.innerHTML = message;
+
+        if (isUser) {
+            currentRow.appendChild(document.createElement('div')); // 占位
+            currentRow.appendChild(bubble);
+        } else {
+            currentRow.appendChild(bubble);
+            currentRow.appendChild(document.createElement('div')); // 占位
         }
-    }
 
-    // 自动滚动到底部（对话流更新）
-    container.scrollTop = container.scrollHeight;
+        document.querySelector('.chat-container').appendChild(currentRow);
+    } else {
+        // 追加到上一行对应气泡
+        const bubble = currentRow.querySelector(`.message.${isUser ? 'user' : 'ai'}`);
+        bubble.innerHTML += message;
+    }
 }
+
 
 // 初始设置为语音模式
 setVoiceMode();
