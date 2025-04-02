@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en-us">
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=0"/>
-    <link rel="icon" href="common/favicon.ico" type="image/x-icon">
-    <title>MiniLive</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta content="width=device-width, height=device-height, user-scalable=0" name="viewport"/>
+    <link href="common/favicon.ico" rel="icon" type="image/x-icon">
+    <title>吉安智能体</title>
     <style>
         body {
             display: flex;
@@ -23,14 +23,14 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-#canvas_video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
+        #canvas_video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
         #canvas_gl {
             position: absolute;
@@ -41,15 +41,15 @@
         }
 
 
-      #screen {
-        position: absolute;
-        bottom: -1000;
-        right: -1000;
-        width: 1px;
-        height: 1px;
-      }
+        #screen {
+            position: absolute;
+            bottom: -1000;
+            right: -1000;
+            width: 1px;
+            height: 1px;
+        }
 
-      #screen2 {
+        #screen2 {
             width: 100%;
             height: 100%;
             position: absolute; /* Position the iframe absolutely */
@@ -58,6 +58,7 @@
             border: none;
             z-index: 5; /* Ensure iframe is above other elements */
         }
+
         /* 居中显示“请点击开始” */
         #startMessage {
             position: absolute;
@@ -69,9 +70,10 @@
             color: #333;
             z-index: -2;
         }
+
         #canvasEl {
             position: absolute;
-            left: -9999px;  /* 移出可视区域 */
+            left: -9999px; /* 移出可视区域 */
             top: -9999px;
             /* 保持canvas正常尺寸 */
             width: 300px;
@@ -79,27 +81,27 @@
         }
     </style>
 
-  </head>
-  <body>
-    <figure style="overflow:visible;" id="loadingSpinner">
-        <strong>MiniMates: loading...</strong>
-    </figure>
-    <canvas id="canvasEl"></canvas>
-    <!-- Visible canvas elements -->
-    <canvas id="canvas_video"></canvas>
+</head>
+<body>
+<figure id="loadingSpinner" style="overflow:visible;">
+    <strong>MiniMates: loading...</strong>
+</figure>
+<canvas id="canvasEl"></canvas>
+<!-- Visible canvas elements -->
+<canvas id="canvas_video"></canvas>
 
-    <canvas id="canvas_gl" width="128" height="128"></canvas>
+<canvas height="128" id="canvas_gl" width="128"></canvas>
 
-    <div id="screen"></div>
-    <iframe id="screen2" src="dialog.html" frameborder="0" style="display: none;"></iframe>
-    <!-- 添加“请点击开始”的元素 -->
-    <div id="startMessage">加载中</div>
+<div id="screen"></div>
+<iframe frameborder="0" id="screen2" src="dialog.html" style="display: none;"></iframe>
+<!-- 添加“请点击开始”的元素 -->
+<div id="startMessage">加载中</div>
 <!--    <script src="js/pako.min.js"></script>-->
 <!--    <script src="js/mp4box.all.min.js"></script>-->
-    <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pako@2.0.4/dist/pako.min.js"></script>
-    <script src="js/DHLiveMini.js"></script>
-    <script src="js/MiniMateLoader.js"></script>
-    <script src="js/MiniLive2.js"></script>
-  </body>
+<script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pako@2.0.4/dist/pako.min.js"></script>
+<script src="js/DHLiveMini.js"></script>
+<script src="js/MiniMateLoader.js"></script>
+<script src="js/MiniLive2.js"></script>
+</body>
 </html>
