@@ -1,0 +1,24 @@
+现有成果
+可本地部署的吉安智能体  目前你可以看到效果图是因为支持http访问服务 + 我开了内网穿透
+语音转换服务器  https://ef72-23-102-82-116.ngrok-free.app/
+大语言模型知识库服务器   https://6fcf-23-102-82-116.ngrok-free.app/api/docs/
+
+本地大语言模型服务器访问时需要的
+api密钥   7NXBQRE-9GDMJFA-P9MA3EC-MQ4K0MQ
+workspace slug id: decfb45a-25f6-4541-b6d4-029172f2fc97
+thread slug id:  587df2b0-573c-43fd-9265-14df45581b86
+
+
+
+
+基于chatGpt服务器的吉安智能体
+https://chatgpt.com/g/g-67dd94e4f69c8191b1f4dbc192666d70-ji-an-zhi-neng-ti
+
+
+
+
+
+
+
+ngrok启动方式
+ngrok start --all --config "C:\CapitalEugene\ngrok.yml"
