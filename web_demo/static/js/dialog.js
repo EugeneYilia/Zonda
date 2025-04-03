@@ -430,3 +430,9 @@ function playAudio() {
         }
     }
 }
+
+document.querySelector('.chat-container').addEventListener('touchmove', (e) => {
+    e.stopPropagation(); // 确保滚动事件被正确处理
+}, { passive: true });
+
+voiceInputArea.style.pointerEvents = 'none'; // 禁止点击穿透
