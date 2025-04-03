@@ -137,6 +137,11 @@ textInput.addEventListener('keypress', (e) => {
     }
 });
 
+function scrollChatToBottom() {
+    const chat = document.querySelector('.chat-container');
+    chat.scrollTop = chat.scrollHeight;
+}
+
 let currentRow = null;
 
 function addMessage(message, isUser, isNew) {
@@ -162,6 +167,8 @@ function addMessage(message, isUser, isNew) {
         const bubble = currentRow.querySelector(`.message.${isUser ? 'user' : 'ai'}`);
         bubble.innerHTML += message;
     }
+
+    scrollChatToBottom();
 }
 
 
@@ -430,6 +437,7 @@ function playAudio() {
         }
     }
 }
+
 
 document.querySelector('.chat-container').addEventListener('touchmove', (e) => {
     e.stopPropagation(); // 确保滚动事件被正确处理
