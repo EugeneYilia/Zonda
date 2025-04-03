@@ -49,10 +49,7 @@ python demo_avatar.py
 We would like to thank the contributors of [Wav2Lip](https://github.com/Rudrabha/Wav2Lip), [DINet](https://github.com/MRzzm/DINet), [LiveSpeechPortrait](https://github.com/YuanxunLu/LiveSpeechPortraits) repositories, for their open research and contributions.
 
 ## License
-DH_live is licensed under the MIT License.
+DigitalHuman is licensed under the MIT License.
 
-DH_live_mini is licensed under the Apache 2.0.
 ## 联系
-| 进入QQ群聊，分享看法和最新咨询。 | 加我好友，请备注“进群”，拉你进去微信交流群。 |
-|-------------------|----------------------|
-| ![QQ群聊](https://github.com/user-attachments/assets/29bfef3f-438a-4b9f-ba09-e1926d1669cb) | ![微信交流群](https://github.com/user-attachments/assets/b1f24ebb-153b-44b1-b522-14f765154110) |
+微信Wechat: MensaEugene
