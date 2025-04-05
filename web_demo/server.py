@@ -156,5 +156,6 @@ if __name__ == "__main__":
         "web_demo.server:app",
         host="0.0.0.0",
         port=8898,
+        reload=True,
         log_config="web_demo/log_config.yml"
     )
