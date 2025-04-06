@@ -143,6 +143,7 @@ function scrollChatToBottom() {
 }
 
 let currentRow = null;
+let loadingBubble = null;
 
 function addMessage(message, isUser, isNew) {
     if (isNew) {
@@ -157,6 +158,11 @@ function addMessage(message, isUser, isNew) {
             currentRow.appendChild(document.createElement('div')); // 占位
             currentRow.appendChild(bubble);
         } else {
+            if (loadingBubble) {
+                loadingBubble.parentElement.remove(); // 移除 loading 行
+                loadingBubble = null;
+            }
+
             currentRow.appendChild(bubble);
             currentRow.appendChild(document.createElement('div')); // 占位
         }
@@ -174,6 +180,19 @@ function addMessage(message, isUser, isNew) {
 
 // 初始设置为语音模式
 setVoiceMode();
+
+function addLoadingBubble() {
+    // 添加 AI 正在思考的提示
+    loadingBubble = document.createElement('div');
+    loadingBubble.className = 'message ai';
+    loadingBubble.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在思考中...';
+    const loadingRow = document.createElement('div');
+    loadingRow.className = 'message-row';
+    loadingRow.appendChild(loadingBubble);
+    loadingRow.appendChild(document.createElement('div')); // 占位
+    document.querySelector('.chat-container').appendChild(loadingRow);
+    scrollChatToBottom();
+}
 
 // 发送文字消息
 function sendTextMessage() {
@@ -202,6 +221,8 @@ function sendTextMessage() {
         if (voiceDropdown) {
             characterName = voiceDropdown.value;
         }
+
+        addLoadingBubble();
         fetch(server_url, {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
