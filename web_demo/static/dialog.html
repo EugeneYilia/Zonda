@@ -141,6 +141,49 @@
             font-size: 16px;
             color: #007bff;
         }
+
+        /* 旋转 loading 圈 */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            border: 2px solid #999;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 跳动的三个点 */
+        .dot {
+            animation: blink 1.5s infinite;
+            font-weight: bold;
+            opacity: 0;
+        }
+
+        .dot1 {
+            animation-delay: 0s;
+        }
+
+        .dot2 {
+            animation-delay: 0.2s;
+        }
+
+        .dot3 {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
     </style>
 </head>
 <body>

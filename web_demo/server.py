@@ -8,12 +8,16 @@ from fastapi.staticfiles import StaticFiles
 
 from web_demo.proxy.LlmProxy import fetch_chat_response
 from web_demo.tils.MDUtils import clean_markdown
+import colorama
+colorama.just_fix_windows_console()
 
 app = FastAPI()
 
 # 挂载静态文件
 app.mount("/static", StaticFiles(directory="web_demo/static"), name="static")
 
+import logging
+logger = logging.getLogger(__name__)
 
 async def get_audio(text_cache, voice_speed, voice_id):
     import edge_tts
@@ -28,7 +32,10 @@ async def get_audio(text_cache, voice_speed, voice_id):
     else:
         rate = f"{int(voice_speed)}%"
 
-    voice = "zh-CN-XiaoxiaoNeural"
+    if voice_id == "female":
+        voice = "zh-CN-XiaoxiaoNeural"
+    else:
+        voice = "zh-TW-YunJheNeural"
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_mp3:
         mp3_path = tmp_mp3.name
@@ -54,7 +61,7 @@ async def get_audio(text_cache, voice_speed, voice_id):
 def llm_answer(question):
     # 模拟大模型的回答
     answer = fetch_chat_response(question)
-    print(answer)
+    logger.info(f"llm answer: {answer}")
     return answer
 
 
@@ -86,7 +93,7 @@ import asyncio
 
 
 async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
-    print("gen_stream", voice_speed, voice_id)
+    logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
     if asr:
         chunk = {"prompt": prompt}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
@@ -135,7 +142,7 @@ async def eb_stream(request: Request):
                                      media_type="application/json")
         elif input_mode == "text":
             prompt = body.get("prompt")
-            print("User text input: " + prompt)
+            logger.info(f"User text input: {prompt}")
             return StreamingResponse(gen_stream(prompt, asr=False, voice_speed=voice_speed, voice_id=voice_id),
                                      media_type="application/json")
         else:
@@ -148,4 +155,10 @@ async def eb_stream(request: Request):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8898)
+    uvicorn.run(
+        "web_demo.server:app",
+        host="0.0.0.0",
+        port=8898,
+        reload=True,
+        log_config="web_demo/log_config.yml"
+    )

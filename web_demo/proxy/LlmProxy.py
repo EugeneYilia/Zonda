@@ -12,29 +12,20 @@ def fetch_chat_response(message: str) -> str:
     返回:
         str: 去除 <think> 思考部分后的真实回答文本
     """
-    url = "http://localhost:3001/api/v1/workspace/decfb45a-25f6-4541-b6d4-029172f2fc97/thread/587df2b0-573c-43fd-9265-14df45581b86/chat"
+    url = "http://localhost:8000/ask"
     headers = {
-        "Authorization": "Bearer 7NXBQRE-9GDMJFA-P9MA3EC-MQ4K0MQ",
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
     payload = {
-        "message": message,
-        "mode": "chat"
+        "question": message
     }
 
     try:
         response = requests.post(url, json=payload, headers=headers)
         if response.status_code == 200:
             data = response.json()
-            text_response = data.get("textResponse", "")
-
-            # 用正则定位 <think> 标签，获取其后的内容
-            match = re.search(r"</think>\s*(.+)", text_response, re.DOTALL)
-            if match:
-                return match.group(1).strip()
-            else:
-                return "未找到 <think> 之后的回答内容。"
+            return data.get("answer")
         else:
             return f"请求失败，状态码：{response.status_code}"
     except Exception as e:

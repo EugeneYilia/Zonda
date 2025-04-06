@@ -1,0 +1,4 @@
+LLM Provider: Ollama   
+LLM model：wangshenzhi/llama3-8b-chinese-chat-ollama-q4
+
+Embedding Model 嵌入模型：  Nomic-embed-text:latest     Chunk Length: 8192

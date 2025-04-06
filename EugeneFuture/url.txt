@@ -1,0 +1,2 @@
+llm server: https://7ae4-23-102-82-113.ngrok-free.app/api/docs/
+voice server: https://4106-23-102-82-113.ngrok-free.app/

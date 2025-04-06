@@ -143,6 +143,7 @@ function scrollChatToBottom() {
 }
 
 let currentRow = null;
+let loadingBubble = null;
 
 function addMessage(message, isUser, isNew) {
     if (isNew) {
@@ -157,6 +158,11 @@ function addMessage(message, isUser, isNew) {
             currentRow.appendChild(document.createElement('div')); // 占位
             currentRow.appendChild(bubble);
         } else {
+            if (loadingBubble) {
+                loadingBubble.parentElement.remove(); // 移除 loading 行
+                loadingBubble = null;
+            }
+
             currentRow.appendChild(bubble);
             currentRow.appendChild(document.createElement('div')); // 占位
         }
@@ -174,6 +180,22 @@ function addMessage(message, isUser, isNew) {
 
 // 初始设置为语音模式
 setVoiceMode();
+
+function addLoadingBubble() {
+    // 添加 AI 正在思考的提示
+    loadingBubble = document.createElement('div');
+    loadingBubble.className = 'message ai';
+    loadingBubble.innerHTML = '<span class="spinner"></span> 正在思考中' +
+        '<span class="dot dot1">.</span>' +
+        '<span class="dot dot2">.</span>' +
+        '<span class="dot dot3">.</span>';
+    const loadingRow = document.createElement('div');
+    loadingRow.className = 'message-row';
+    loadingRow.appendChild(loadingBubble);
+    loadingRow.appendChild(document.createElement('div')); // 占位
+    document.querySelector('.chat-container').appendChild(loadingRow);
+    scrollChatToBottom();
+}
 
 // 发送文字消息
 function sendTextMessage() {
@@ -196,19 +218,28 @@ function sendTextMessage() {
         isEnding = false;
         isNewChat = true;
         textInput.value = "";
-        // 获取音色名称
-        let characterName = "";
-        const voiceDropdown = window.parent.document.getElementById('voiceDropdown');
-        if (voiceDropdown) {
-            characterName = voiceDropdown.value;
+
+        // 获取 voice_id：根据 characterDropdown 选择男性或女性
+        let voiceId = "";
+        const characterDropdown = window.parent.document.getElementById('characterDropdown');
+        if (characterDropdown) {
+            const selectedValue = characterDropdown.value;
+            // 判断男性或女性
+            if (selectedValue === "assets") {
+                voiceId = "male";
+            } else if (selectedValue === "assets2") {
+                voiceId = "female";
+            }
         }
+
+        addLoadingBubble();
         fetch(server_url, {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 "input_mode": "text",
                 'prompt': inputValue,
-                'voice_id': characterName,
+                'voice_id': voiceId,
                 'voice_speed': ""
             }),
             signal: controller.signal

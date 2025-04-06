@@ -1,0 +1,12 @@
+version: "1"
+authtoken: 2ucieknUrJ4HXIF3Lq66hXrfzX7_3ES2R5KgecqMHq8jXByQC
+tunnels:
+  llm_server:
+    proto: http
+    addr: 3001
+  voice_server:
+    proto: http
+    addr: 7860
+  dh_server:
+    proto: http
+    addr: 8898
