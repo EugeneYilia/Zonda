@@ -185,7 +185,10 @@ function addLoadingBubble() {
     // 添加 AI 正在思考的提示
     loadingBubble = document.createElement('div');
     loadingBubble.className = 'message ai';
-    loadingBubble.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在思考中...';
+    loadingBubble.innerHTML = '<span class="spinner"></span> 正在思考中' +
+        '<span class="dot dot1">.</span>' +
+        '<span class="dot dot2">.</span>' +
+        '<span class="dot dot3">.</span>';
     const loadingRow = document.createElement('div');
     loadingRow.className = 'message-row';
     loadingRow.appendChild(loadingBubble);
