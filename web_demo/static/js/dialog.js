@@ -218,11 +218,18 @@ function sendTextMessage() {
         isEnding = false;
         isNewChat = true;
         textInput.value = "";
-        // 获取音色名称
-        let characterName = "";
-        const voiceDropdown = window.parent.document.getElementById('voiceDropdown');
-        if (voiceDropdown) {
-            characterName = voiceDropdown.value;
+
+        // 获取 voice_id：根据 characterDropdown 选择男性或女性
+        let voiceId = "";
+        const characterDropdown = window.parent.document.getElementById('characterDropdown');
+        if (characterDropdown) {
+            const selectedValue = characterDropdown.value;
+            // 判断男性或女性
+            if (selectedValue === "assets") {
+                voiceId = "male";
+            } else if (selectedValue === "assets2") {
+                voiceId = "female";
+            }
         }
 
         addLoadingBubble();
@@ -232,7 +239,7 @@ function sendTextMessage() {
             body: JSON.stringify({
                 "input_mode": "text",
                 'prompt': inputValue,
-                'voice_id': characterName,
+                'voice_id': voiceId,
                 'voice_speed': ""
             }),
             signal: controller.signal
