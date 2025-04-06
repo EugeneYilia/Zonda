@@ -32,7 +32,10 @@ async def get_audio(text_cache, voice_speed, voice_id):
     else:
         rate = f"{int(voice_speed)}%"
 
-    voice = "zh-CN-XiaoxiaoNeural"
+    if voice_id == "female":
+        voice = "zh-CN-XiaoxiaoNeural"
+    else:
+        voice = "zh-TW-YunJheNeural"
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_mp3:
         mp3_path = tmp_mp3.name
