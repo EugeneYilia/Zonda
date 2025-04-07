@@ -10,3 +10,4 @@ edge-tts
 pydub
 colorama
 colorlog
+httpx

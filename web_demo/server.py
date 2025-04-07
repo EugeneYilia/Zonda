@@ -2,6 +2,7 @@ import base64
 import json
 import re
 
+import httpx
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -19,7 +20,7 @@ app.mount("/static", StaticFiles(directory="web_demo/static"), name="static")
 import logging
 logger = logging.getLogger(__name__)
 
-async def get_audio(text_cache, voice_speed, voice_id):
+async def get_audio_by_edge_tts(text_cache, voice_speed, voice_id):
     import edge_tts
     import tempfile
     import os
@@ -57,6 +58,17 @@ async def get_audio(text_cache, voice_speed, voice_id):
 
     return base64.b64encode(audio_value).decode("utf-8")
 
+async def get_audio(text, voice_speed, voice_id):
+    url = "http://127.0.0.1:8118"
+    payload = {
+        "text": text,
+        "voice_id": voice_id
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, json=payload)
+        response.raise_for_status()  # 抛出非 2xx 异常
+        return response.text
 
 def llm_answer(question):
     # 模拟大模型的回答
