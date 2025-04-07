@@ -68,7 +68,7 @@ async def get_audio(text, voice_speed, voice_id):
 
     timeout = httpx.Timeout(300.0, connect=30.0)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout = timeout) as client:
         response = await client.post(url, json=payload)
         response.raise_for_status()  # 抛出非 2xx 异常
         return response.text
