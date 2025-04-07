@@ -2,6 +2,7 @@ import base64
 import json
 import re
 
+import httpx
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -19,7 +20,7 @@ app.mount("/static", StaticFiles(directory="web_demo/static"), name="static")
 import logging
 logger = logging.getLogger(__name__)
 
-async def get_audio(text_cache, voice_speed, voice_id):
+async def get_audio_by_edge_tts(text_cache, voice_speed, voice_id):
     import edge_tts
     import tempfile
     import os
@@ -57,6 +58,25 @@ async def get_audio(text_cache, voice_speed, voice_id):
 
     return base64.b64encode(audio_value).decode("utf-8")
 
+async def get_audio(text, voice_speed, voice_id):
+    logger.info(get_audio)
+    url = "http://127.0.0.1:8118/tts"
+    payload = {
+        "text": text,
+        "voice_id": voice_id
+    }
+
+    timeout = httpx.Timeout(300.0, connect=30.0)
+
+    async with httpx.AsyncClient(timeout = timeout) as client:
+        response = await client.post(url, json=payload)
+        response.raise_for_status()  # 抛出非 2xx 异常
+        # ✅ 用 response.json() 解析 JSON
+        data = response.json()
+        base64_audio = data["audio"]
+        logger.info("Received base64 audio string.")
+
+        return base64_audio
 
 def llm_answer(question):
     # 模拟大模型的回答
@@ -89,8 +109,6 @@ def split_sentence(sentence, min_length=10):
     return sentences
 
 
-import asyncio
-
 
 async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
     logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
@@ -106,7 +124,6 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
         # 生成 JSON 格式的数据块
         chunk = {"text": sub_text, "audio": base64_string, "endpoint": index_ == len(sentences) - 1}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
-        await asyncio.sleep(0.2)  # 模拟异步延迟
 
 
 # 处理 ASR 和 TTS 的端点
@@ -158,7 +175,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "web_demo.server:app",
         host="0.0.0.0",
-        port=8898,
+        port=8899,
         reload=True,
         log_config="web_demo/log_config.yml"
     )

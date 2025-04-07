@@ -44,7 +44,9 @@ toggleButton.addEventListener('click', () => {
     if (isVoiceMode) {
         setTextMode();
     } else {
-        setVoiceMode();
+        // setVoiceMode();
+        // 暂时只支持文字模式
+        setTextMode();
     }
 });
 
@@ -179,7 +181,7 @@ function addMessage(message, isUser, isNew) {
 
 
 // 初始设置为语音模式
-setVoiceMode();
+setTextMode();
 
 function addLoadingBubble() {
     // 添加 AI 正在思考的提示
