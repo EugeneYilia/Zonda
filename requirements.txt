@@ -8,3 +8,5 @@ PyOpenGL
 gradio
 edge-tts
 pydub
+colorama
+colorlog
