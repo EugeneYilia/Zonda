@@ -59,6 +59,7 @@ async def get_audio_by_edge_tts(text_cache, voice_speed, voice_id):
     return base64.b64encode(audio_value).decode("utf-8")
 
 async def get_audio(text, voice_speed, voice_id):
+    logger.info(get_audio)
     url = "http://127.0.0.1:8118"
     payload = {
         "text": text,
@@ -101,8 +102,6 @@ def split_sentence(sentence, min_length=10):
     return sentences
 
 
-import asyncio
-
 
 async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
     logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
@@ -118,7 +117,6 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
         # 生成 JSON 格式的数据块
         chunk = {"text": sub_text, "audio": base64_string, "endpoint": index_ == len(sentences) - 1}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
-        await asyncio.sleep(0.2)  # 模拟异步延迟
 
 
 # 处理 ASR 和 TTS 的端点
