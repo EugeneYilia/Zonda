@@ -60,11 +60,13 @@ async def get_audio_by_edge_tts(text_cache, voice_speed, voice_id):
 
 async def get_audio(text, voice_speed, voice_id):
     logger.info(get_audio)
-    url = "http://127.0.0.1:8118"
+    url = "http://127.0.0.1:8118/tts"
     payload = {
         "text": text,
         "voice_id": voice_id
     }
+
+    timeout = httpx.Timeout(300.0, connect=30.0)
 
     async with httpx.AsyncClient() as client:
         response = await client.post(url, json=payload)
@@ -168,7 +170,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "web_demo.server:app",
         host="0.0.0.0",
-        port=8898,
+        port=8899,
         reload=True,
         log_config="web_demo/log_config.yml"
     )
