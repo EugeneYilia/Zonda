@@ -9,4 +9,4 @@ tunnels:
     addr: 8118
   dh_server:
     proto: http
-    addr: 8898
+    addr: 8899

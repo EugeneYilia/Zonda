@@ -175,7 +175,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "web_demo.server:app",
         host="0.0.0.0",
-        port=8898,
+        port=8899,
         reload=True,
         log_config="web_demo/log_config.yml"
     )
