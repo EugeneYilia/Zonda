@@ -379,7 +379,7 @@ var createQtAppInstance = ( () => {
             return filename.startsWith("file://")
         }
         var wasmBinaryFile;
-        wasmBinaryFile = "DHLiveMini.wasm";
+        wasmBinaryFile = "static/DHLiveMini.wasm";
         if (!isDataURI(wasmBinaryFile)) {
             wasmBinaryFile = locateFile(wasmBinaryFile)
         }

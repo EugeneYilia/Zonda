@@ -6,6 +6,8 @@ import httpx
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 
 from web_demo.proxy.LlmProxy import fetch_chat_response
 from web_demo.tils.MDUtils import clean_markdown
@@ -168,6 +170,11 @@ async def eb_stream(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/", response_class=FileResponse)
+async def read_root():
+    return FileResponse("web_demo/static/Yuri.html", media_type="text/html")
+
+
 # 启动Uvicorn服务器
 if __name__ == "__main__":
     import uvicorn
@@ -175,7 +182,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "web_demo.server:app",
         host="0.0.0.0",
-        port=8899,
+        port=8890,
         reload=True,
         log_config="web_demo/log_config.yml"
     )

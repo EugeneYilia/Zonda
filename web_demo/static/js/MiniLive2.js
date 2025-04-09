@@ -397,7 +397,7 @@ async function init_gl() {
         gl.activeTexture(gl.TEXTURE0);
         gl.uniform1i(gl.getUniformLocation(program, 'texture_bs'), 0);
     };
-    image.src = 'common/bs_texture_halfFace.png';
+    image.src = 'static/common/bs_texture_halfFace.png';
 }
 
 async function setupVertsBuffers() {
@@ -406,7 +406,7 @@ async function setupVertsBuffers() {
 }
 
 async function newVideoTask() {
-    await videoProcessor.init("assets/01.mp4", "assets/combined_data.json.gz");
+    await videoProcessor.init("static/assets/01.mp4", "static/assets/combined_data.json.gz");
     // 加载 combined_data.json.gz
     await loadCombinedData();
     await init_gl();

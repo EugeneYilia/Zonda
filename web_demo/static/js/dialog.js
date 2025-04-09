@@ -227,9 +227,9 @@ function sendTextMessage() {
         if (characterDropdown) {
             const selectedValue = characterDropdown.value;
             // 判断男性或女性
-            if (selectedValue === "assets") {
+            if (selectedValue === "static/assets") {
                 voiceId = "male";
-            } else if (selectedValue === "assets2") {
+            } else if (selectedValue === "static/assets2") {
                 voiceId = "female";
             }
         }
