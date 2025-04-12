@@ -3,10 +3,10 @@ authtoken: 2ucieknUrJ4HXIF3Lq66hXrfzX7_3ES2R5KgecqMHq8jXByQC
 tunnels:
   llm_server:
     proto: http
-    addr: 3001
+    addr: 8000
   voice_server:
     proto: http
-    addr: 7860
+    addr: 8118
   dh_server:
     proto: http
-    addr: 8898
+    addr: 8899
