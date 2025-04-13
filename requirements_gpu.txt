@@ -1,0 +1,36 @@
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# ========== 声学前端 ==========
+kaldi_native_fbank
+
+# ========== 人体检测 ==========
+# 注意：mediapipe 目前仅官方发布 CPU 包，GPU 版本需源码编译或使用 edge TPU 等加速设备
+mediapipe
+
+# ========== 通用工具库 ==========
+tqdm
+scikit-learn
+pyglm
+
+# ========== 图形处理 ==========
+glfw
+PyOpenGL
+
+# ========== Web UI ==========
+gradio
+
+# ========== 音频处理 ==========
+pydub
+
+# ========== 日志工具 ==========
+colorama
+colorlog
+
+# ========== 网络请求 ==========
+httpx
+
+# ========== 深度学习（GPU） ==========
+torch==2.3.0+cu121
+torchaudio==2.3.0
+
+
