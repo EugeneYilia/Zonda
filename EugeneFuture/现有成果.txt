@@ -35,3 +35,9 @@ npm start
 
 Check docker log
 docker logs -f containerId
+
+
+之后或许可以选择
+pip install coqui-tts
+而不是
+pip install tts
