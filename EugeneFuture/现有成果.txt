@@ -31,3 +31,7 @@ Path
 C:\Users\yichenliu\JiAn\AiProjects\qdrant-web-ui
 
 npm start
+
+
+Check docker log
+docker logs -f containerId
