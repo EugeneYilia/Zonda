@@ -22,46 +22,46 @@ app.mount("/static", StaticFiles(directory="web_demo/static"), name="static")
 import logging
 logger = logging.getLogger(__name__)
 
-async def get_audio_by_edge_tts(text_cache, voice_speed, voice_id):
-    import edge_tts
-    import tempfile
-    import os
-    from pydub import AudioSegment
-
-    if voice_speed is None or voice_speed == "":
-        rate = "+0%"  # rate = "-50%"
-    elif int(voice_speed) >= 0:
-        rate = f"+{int(voice_speed)}%"
-    else:
-        rate = f"{int(voice_speed)}%"
-
-    if voice_id == "female":
-        voice = "zh-CN-XiaoxiaoNeural"
-    else:
-        voice = "zh-TW-YunJheNeural"
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_mp3:
-        mp3_path = tmp_mp3.name
-    wav_path = mp3_path.replace(".mp3", ".wav")
-
-    communicate = edge_tts.Communicate(text_cache, voice=voice, rate=rate)
-    await communicate.save(mp3_path)
-
-    # 转换为 WAV
-    sound = AudioSegment.from_file(mp3_path, format="mp3")
-    sound = sound.set_frame_rate(16000).set_channels(1)
-    sound.export(wav_path, format="wav")
-
-    with open(wav_path, "rb") as audio_file:
-        audio_value = audio_file.read()
-
-    os.remove(mp3_path)
-    os.remove(wav_path)
-
-    return base64.b64encode(audio_value).decode("utf-8")
+# async def get_audio_by_edge_tts(text_cache, voice_speed, voice_id):
+#     import edge_tts
+#     import tempfile
+#     import os
+#     from pydub import AudioSegment
+#
+#     if voice_speed is None or voice_speed == "":
+#         rate = "+0%"  # rate = "-50%"
+#     elif int(voice_speed) >= 0:
+#         rate = f"+{int(voice_speed)}%"
+#     else:
+#         rate = f"{int(voice_speed)}%"
+#
+#     if voice_id == "female":
+#         voice = "zh-CN-XiaoxiaoNeural"
+#     else:
+#         voice = "zh-TW-YunJheNeural"
+#
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_mp3:
+#         mp3_path = tmp_mp3.name
+#     wav_path = mp3_path.replace(".mp3", ".wav")
+#
+#     communicate = edge_tts.Communicate(text_cache, voice=voice, rate=rate)
+#     await communicate.save(mp3_path)
+#
+#     # 转换为 WAV
+#     sound = AudioSegment.from_file(mp3_path, format="mp3")
+#     sound = sound.set_frame_rate(16000).set_channels(1)
+#     sound.export(wav_path, format="wav")
+#
+#     with open(wav_path, "rb") as audio_file:
+#         audio_value = audio_file.read()
+#
+#     os.remove(mp3_path)
+#     os.remove(wav_path)
+#
+#     return base64.b64encode(audio_value).decode("utf-8")
 
 async def get_audio(text, voice_speed, voice_id):
-    logger.info(get_audio)
+    logger.info("text: {} voice_speed: {}  voice_id: {}", text, voice_speed, voice_id)
     url = "http://127.0.0.1:8118/tts"
     payload = {
         "text": text,
