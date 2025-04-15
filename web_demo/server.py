@@ -142,8 +142,8 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 def is_punctuation(char):
-    print(f"传入的 char：{repr(char)}，长度：{len(char)}")
-    return unicodedata.category(char).startswith('P')
+    logger.info(f"传入的 char：{repr(char)}，长度：{len(char)}")
+    return isinstance(char, str) and len(char) == 1 and unicodedata.category(char).startswith('P')
 
 # 处理 ASR 和 TTS 的端点
 @app.post("/process_audio")
