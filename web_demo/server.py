@@ -1,7 +1,6 @@
 import base64
 import json
 import re
-import unicodedata
 
 import httpx
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
@@ -133,17 +132,9 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
             continue
         base64_string = await get_audio(clear_llm_response, voice_speed, voice_id)
         # 生成 JSON 格式的数据块
-        if clear_llm_response == "[Heil Hitler!]":
-            chunk = {"text": "", "audio": "", "endpoint": True}
-        elif is_punctuation(clear_llm_response):
-            chunk = {"text": clear_llm_response, "audio": "", "endpoint": False}
-        else:
-            chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": False}
-        yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
-def is_punctuation(char):
-    logger.info(f"传入的 char：{repr(char)}，长度：{len(char)}")
-    return isinstance(char, str) and len(char) == 1 and unicodedata.category(char).startswith('P')
+        chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": clear_llm_response.endswith("[Heil Hitler!]")}
+        yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 # 处理 ASR 和 TTS 的端点
 @app.post("/process_audio")
