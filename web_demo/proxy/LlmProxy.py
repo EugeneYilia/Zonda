@@ -1,5 +1,8 @@
+import logging
+
 import requests
 
+logger = logging.getLogger(__name__)
 
 def fetch_llm_stream(message: str):
     """
@@ -21,6 +24,7 @@ def fetch_llm_stream(message: str):
     }
 
     try:
+        logging.info("fetch_llm_stream")
         # stream=True 开启流式响应
         with requests.post(url, json=payload, headers=headers, stream=True) as response:
             if response.status_code != 200:
