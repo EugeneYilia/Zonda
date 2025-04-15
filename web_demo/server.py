@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
-from web_demo.proxy.LlmProxy import fetch_chat_response
+from web_demo.proxy.LlmProxy import fetch_llm_stream
 from web_demo.tils.MDUtils import clean_markdown
 import colorama
 colorama.just_fix_windows_console()
@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 #     return base64.b64encode(audio_value).decode("utf-8")
 
 async def get_audio(text, voice_speed, voice_id):
-    logger.info("text: {} voice_speed: {}  voice_id: {}", text, voice_speed, voice_id)
+    logger.info(f"text: {text} voice_speed: {voice_speed}  voice_id: {voice_id}")
     url = "http://127.0.0.1:8118/tts"
     payload = {
         "text": text,
@@ -79,13 +79,6 @@ async def get_audio(text, voice_speed, voice_id):
         logger.info("Received base64 audio string.")
 
         return base64_audio
-
-def llm_answer(question):
-    # 模拟大模型的回答
-    answer = fetch_chat_response(question)
-    logger.info(f"llm answer: {answer}")
-    return answer
-
 
 def split_sentence(sentence, min_length=10):
     # 定义包括小括号在内的主要标点符号
@@ -111,6 +104,20 @@ def split_sentence(sentence, min_length=10):
     return sentences
 
 
+# async def gen_stream_old(prompt, asr=False, voice_speed=None, voice_id=None):
+#     logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
+#     if asr:
+#         chunk = {"prompt": prompt}
+#         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
+#
+#     text_cache = llm_answer(prompt)
+#     sentences = split_sentence(text_cache)
+#
+#     for index_, sub_text in enumerate(sentences):
+#         base64_string = await get_audio(clean_markdown(sub_text), voice_speed, voice_id)
+#         # 生成 JSON 格式的数据块
+#         chunk = {"text": sub_text, "audio": base64_string, "endpoint": index_ == len(sentences) - 1}
+#         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
     logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
@@ -118,13 +125,12 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
         chunk = {"prompt": prompt}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
-    text_cache = llm_answer(prompt)
-    sentences = split_sentence(text_cache)
-
-    for index_, sub_text in enumerate(sentences):
-        base64_string = await get_audio(clean_markdown(sub_text), voice_speed, voice_id)
+    for llm_response in fetch_llm_stream(prompt):
+        logger.info(f"gen_stream   llm_response: {llm_response}")
+        clear_llm_response = clean_markdown(llm_response)
+        base64_string = await get_audio(clear_llm_response, voice_speed, voice_id)
         # 生成 JSON 格式的数据块
-        chunk = {"text": sub_text, "audio": base64_string, "endpoint": index_ == len(sentences) - 1}
+        chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": llm_response == "[Heil Hitler!]"}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 
