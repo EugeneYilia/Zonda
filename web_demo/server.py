@@ -132,7 +132,10 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
             continue
         base64_string = await get_audio(clear_llm_response, voice_speed, voice_id)
         # 生成 JSON 格式的数据块
-        chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": llm_response == "[Heil Hitler!]"}
+        if llm_response == "[Heil Hitler!]":
+            chunk = {"text": "", "audio": "", "endpoint": True}
+        else:
+            chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": False}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 
@@ -190,7 +193,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "web_demo.server:app",
         host="0.0.0.0",
-        port=8890,
+        port=8898,
         reload=True,
         log_config="web_demo/log_config.yml"
     )
