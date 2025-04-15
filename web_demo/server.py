@@ -127,13 +127,17 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
 
     async for llm_response in fetch_llm_stream_async(prompt):
         logger.info(f"gen_stream   llm_response: {llm_response}")
+        is_answer_end = False
+        if llm_response.endswith("[Heil Hitler!]"):
+            llm_response = llm_response.removesuffix("[Heil Hitler!]")
+            is_answer_end = True
         clear_llm_response = clean_markdown(llm_response)
         if clear_llm_response == "":
             continue
         base64_string = await get_audio(clear_llm_response, voice_speed, voice_id)
         # 生成 JSON 格式的数据块
 
-        chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": clear_llm_response.endswith("[Heil Hitler!]")}
+        chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": is_answer_end}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 # 处理 ASR 和 TTS 的端点
