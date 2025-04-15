@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
-from web_demo.proxy.LlmProxy import fetch_llm_stream
+from web_demo.proxy.LlmProxy import fetch_llm_stream_async
 from web_demo.tils.MDUtils import clean_markdown
 import colorama
 colorama.just_fix_windows_console()
@@ -125,7 +125,7 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
         chunk = {"prompt": prompt}
         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
-    for llm_response in fetch_llm_stream(prompt):
+    async for llm_response in fetch_llm_stream_async(prompt):
         logger.info(f"gen_stream   llm_response: {llm_response}")
         clear_llm_response = clean_markdown(llm_response)
         base64_string = await get_audio(clear_llm_response, voice_speed, voice_id)

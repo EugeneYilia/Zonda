@@ -1,10 +1,9 @@
 import logging
-
-import requests
+import httpx
 
 logger = logging.getLogger(__name__)
 
-def fetch_llm_stream(message: str):
+async def fetch_llm_stream_async(message: str):
     """
     向本地 HTTP 接口发送聊天请求，并返回 textResponse 中 <think> 标签之后的正文内容。
 
@@ -25,13 +24,17 @@ def fetch_llm_stream(message: str):
 
     try:
         logging.info("fetch_llm_stream")
-        # stream=True 开启流式响应
-        with requests.post(url, json=payload, headers=headers, stream=True) as response:
-            if response.status_code != 200:
-                return f"请求失败，状态码：{response.status_code}"
 
-            for line in response.iter_lines(decode_unicode=True):
-                if line:
-                    yield line
+        timeout = httpx.Timeout(300.0, connect=30.0)
+        async with httpx.AsyncClient(timeout = timeout) as client:
+            async with client.stream("POST", url, headers=headers, json=payload) as response:
+                if response.status_code != 200:
+                    logger.error(f"[错误] 状态码：{response.status_code}")
+                    raise Exception(f"[错误] 状态码：{response.status_code}")
+
+                async for line in response.aiter_lines():
+                    if line:
+                        yield line
     except Exception as e:
-        return f"请求异常：{e}"
+        logger.error(f"请求异常：{e}")
+        raise e
