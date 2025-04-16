@@ -222,7 +222,7 @@ function sendTextMessage() {
         textInput.value = "";
 
         // 获取 voice_id：根据 characterDropdown 选择男性或女性
-        let voiceId = "";
+        let voiceId = "male";
         const characterDropdown = window.parent.document.getElementById('characterDropdown');
         if (characterDropdown) {
             const selectedValue = characterDropdown.value;
@@ -231,6 +231,8 @@ function sendTextMessage() {
                 voiceId = "male";
             } else if (selectedValue === "static/assets2") {
                 voiceId = "female";
+            }  else if (selectedValue === "static/assets2") {
+                voiceId = "male";
             }
         }
 
