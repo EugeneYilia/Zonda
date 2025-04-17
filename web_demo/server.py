@@ -123,9 +123,14 @@ def split_sentence(sentence, min_length=10):
 
 async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
     logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
+
     if asr:
         chunk = {"prompt": prompt}
-        yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
+        yield f"{json.dumps(chunk)}\n"
+
+    # 并发处理容器
+    tasks = []
+    idx = 0
 
     async for llm_response in fetch_llm_stream_async(prompt):
         logger.info(f"gen_stream   llm_response: {llm_response}")
@@ -133,14 +138,25 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
         if llm_response.endswith("[Heil Hitler!]"):
             llm_response = llm_response.removesuffix("[Heil Hitler!]")
             is_answer_end = True
+
         clear_llm_response = clean_markdown(llm_response)
         if clear_llm_response == "":
             continue
-        base64_string = await get_audio(clear_llm_response, voice_speed, voice_id)
-        # 生成 JSON 格式的数据块
 
-        chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": is_answer_end}
-        yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
+        # 为当前响应创建异步音频任务
+        task = asyncio.create_task(get_audio(clear_llm_response, voice_speed, voice_id))
+        tasks.append((idx, clear_llm_response, task, is_answer_end))
+        idx += 1
+
+    # 按顺序 await 音频任务并 yield 到前端
+    for idx, text, task, is_end in sorted(tasks, key=lambda x: x[0]):
+        try:
+            base64_string = await task
+        except Exception as e:
+            logger.exception(f"get_audio failed at idx={idx}: {e}")
+            base64_string = ""
+        chunk = {"text": text, "audio": base64_string, "endpoint": is_end}
+        yield f"{json.dumps(chunk)}\n"
 
 # 处理 ASR 和 TTS 的端点
 @app.post("/process_audio")
