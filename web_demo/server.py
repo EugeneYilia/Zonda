@@ -78,7 +78,7 @@ async def get_audio(text, voice_speed, voice_id):
         # ✅ 用 response.json() 解析 JSON
         data = response.json()
         base64_audio = data["audio"]
-        logger.info("Received base64 audio string.")
+        logger.info(f"Received base64 audio string {text}.")
 
         return base64_audio
 
