@@ -38,6 +38,16 @@ docker logs -f containerId
 
 
 之后或许可以选择
-pip install coqui-tts
+pip install coqui-tts   (持续在维护和开发，更好)
 而不是
-pip install tts
+pip install tts         (已停止开发新的内容)
+
+
+
+测试用的提示词
+Q:问一个邻孔间距问题，孔号为N2，在深度40米处，实际孔间距为多少
+A:在深度40米处，孔号为N2，实际邻孔间距为2626.06毫米。
+
+
+Q:问一个邻孔间距问题，孔号为N3，在深度150米处，实际孔间距为多少
+A:在深度150米处，孔号为N3的邻孔间距为2642.42毫米。
