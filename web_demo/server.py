@@ -122,7 +122,7 @@ def split_sentence(sentence, min_length=10):
 #         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
-    logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
+    logger.info(f"gen_stream  prompt: {prompt}  voice_speed: {voice_speed}   voice_id: {voice_id}")
 
     if asr:
         chunk = {"prompt": prompt}
