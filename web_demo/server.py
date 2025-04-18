@@ -75,10 +75,9 @@ async def get_audio(text, voice_speed, voice_id):
     async with httpx.AsyncClient(timeout = timeout) as client:
         response = await client.post(url, json=payload)
         response.raise_for_status()  # 抛出非 2xx 异常
-        # ✅ 用 response.json() 解析 JSON
         data = response.json()
         base64_audio = data["audio"]
-        logger.info("Received base64 audio string.")
+        logger.info(f"Received base64 audio string {text}.")
 
         return base64_audio
 
@@ -122,10 +121,15 @@ def split_sentence(sentence, min_length=10):
 #         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
 async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
-    logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
+    logger.info(f"gen_stream  prompt: {prompt}  voice_speed: {voice_speed}   voice_id: {voice_id}")
+
     if asr:
         chunk = {"prompt": prompt}
-        yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
+        yield f"{json.dumps(chunk)}\n"
+
+    # 并发处理容器
+    tasks = []
+    idx = 0
 
     async for llm_response in fetch_llm_stream_async(prompt):
         logger.info(f"gen_stream   llm_response: {llm_response}")
@@ -133,14 +137,25 @@ async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
         if llm_response.endswith("[Heil Hitler!]"):
             llm_response = llm_response.removesuffix("[Heil Hitler!]")
             is_answer_end = True
+
         clear_llm_response = clean_markdown(llm_response)
         if clear_llm_response == "":
             continue
-        base64_string = await get_audio(clear_llm_response, voice_speed, voice_id)
-        # 生成 JSON 格式的数据块
 
-        chunk = {"text": clear_llm_response, "audio": base64_string, "endpoint": is_answer_end}
-        yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
+        # 为当前响应创建异步音频任务
+        task = asyncio.create_task(get_audio(clear_llm_response, voice_speed, voice_id))
+        tasks.append((idx, clear_llm_response, task, is_answer_end))
+        idx += 1
+
+    # 按顺序 await 音频任务并 yield 到前端
+    for idx, text, task, is_end in sorted(tasks, key=lambda x: x[0]):
+        try:
+            base64_string = await task
+        except Exception as e:
+            logger.exception(f"get_audio failed at idx={idx}: {e}")
+            base64_string = ""
+        chunk = {"text": text, "audio": base64_string, "endpoint": is_end}
+        yield f"{json.dumps(chunk)}\n"
 
 # 处理 ASR 和 TTS 的端点
 @app.post("/process_audio")
