@@ -4,6 +4,7 @@ import re
 import asyncio
 import time
 
+from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
@@ -11,12 +12,24 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
+from web_demo import SystemConfig
 from web_demo.proxy.LlmProxy import fetch_llm_stream_async
 from web_demo.tils.MDUtils import clean_markdown
 import colorama
 colorama.just_fix_windows_console()
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ✅ 启动前执行
+    logger.info("FastAPI 启动：is_use_gpu: %s", SystemConfig.is_use_gpu)
+    logger.info("FastAPI 启动：is_dev_mode: %s", SystemConfig.is_dev_mode)
+
+    yield  # 🟢 应用运行中
+
+    # ✅ 关闭前执行（可选）
+    logger.info("FastAPI 即将关闭")
+app = FastAPI(lifespan=lifespan)
 
 # 挂载静态文件
 app.mount("/static", StaticFiles(directory="web_demo/static"), name="static")
@@ -208,10 +221,19 @@ async def read_root():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        "web_demo.server:app",
-        host="0.0.0.0",
-        port=8898,
-        reload=True,
-        log_config="web_demo/log_config.yml"
-    )
+    if SystemConfig.is_dev_mode:
+        uvicorn.run(
+            "web_demo.server:app",
+            host="0.0.0.0",
+            port=8898,
+            reload=SystemConfig.is_dev_mode,
+            log_config="web_demo/log_config.yml"
+        )
+    else:
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=8898,
+            reload=SystemConfig.is_dev_mode,
+            log_config="web_demo/log_config.yml"
+        )
