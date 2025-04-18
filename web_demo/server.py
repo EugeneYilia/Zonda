@@ -75,7 +75,6 @@ async def get_audio(text, voice_speed, voice_id):
     async with httpx.AsyncClient(timeout = timeout) as client:
         response = await client.post(url, json=payload)
         response.raise_for_status()  # 抛出非 2xx 异常
-        # ✅ 用 response.json() 解析 JSON
         data = response.json()
         base64_audio = data["audio"]
         logger.info(f"Received base64 audio string {text}.")
