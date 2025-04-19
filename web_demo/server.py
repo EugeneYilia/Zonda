@@ -118,13 +118,13 @@ def split_sentence(sentence, min_length=10):
     return sentences
 
 
-# async def gen_stream_old(prompt, asr=False, voice_speed=None, voice_id=None):
+# async def gen_stream_old(question, asr=False, voice_speed=None, voice_id=None):
 #     logger.info(f"gen_stream   voice_speed: {voice_speed}   voice_id: {voice_id}")
 #     if asr:
-#         chunk = {"prompt": prompt}
+#         chunk = {"question": question}
 #         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 #
-#     text_cache = llm_answer(prompt)
+#     text_cache = llm_answer(question)
 #     sentences = split_sentence(text_cache)
 #
 #     for index_, sub_text in enumerate(sentences):
@@ -133,18 +133,18 @@ def split_sentence(sentence, min_length=10):
 #         chunk = {"text": sub_text, "audio": base64_string, "endpoint": index_ == len(sentences) - 1}
 #         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
-async def gen_stream(prompt, asr=False, voice_speed=None, voice_id=None):
-    logger.info(f"gen_stream  prompt: {prompt}  voice_speed: {voice_speed}   voice_id: {voice_id}")
+async def gen_stream(question, asr=False, voice_speed=None, voice_id=None):
+    logger.info(f"gen_stream  question: {question}  voice_speed: {voice_speed}   voice_id: {voice_id}")
 
     if asr:
-        chunk = {"prompt": prompt}
+        chunk = {"question": question}
         yield f"{json.dumps(chunk)}\n"
 
     # 并发处理容器
     tasks = []
     idx = 0
 
-    async for llm_response in fetch_llm_stream_async(prompt):
+    async for llm_response in fetch_llm_stream_async(question):
         logger.info(f"gen_stream   llm_response: {llm_response}")
         is_answer_end = False
         if llm_response.endswith("[Heil Hitler!]"):
@@ -198,13 +198,13 @@ async def eb_stream(request: Request):
             # 解码 Base64 音频数据
             audio_data = base64.b64decode(base64_audio)
             # 这里可以添加对音频数据的处理逻辑
-            prompt = await call_asr_api(audio_data)  # 假设 call_asr_api 可以处理音频数据
-            return StreamingResponse(gen_stream(prompt, asr=True, voice_speed=voice_speed, voice_id=voice_id),
+            question = await call_asr_api(audio_data)  # 假设 call_asr_api 可以处理音频数据
+            return StreamingResponse(gen_stream(question, asr=True, voice_speed=voice_speed, voice_id=voice_id),
                                      media_type="application/json")
         elif input_mode == "text":
-            prompt = body.get("prompt")
-            logger.info(f"User text input: {prompt}")
-            return StreamingResponse(gen_stream(prompt, asr=False, voice_speed=voice_speed, voice_id=voice_id),
+            question = body.get("question")
+            logger.info(f"User text input: {question}")
+            return StreamingResponse(gen_stream(question, asr=False, voice_speed=voice_speed, voice_id=voice_id),
                                      media_type="application/json")
         else:
             raise HTTPException(status_code=400, detail="Invalid input mode")

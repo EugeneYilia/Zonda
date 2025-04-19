@@ -242,7 +242,7 @@ function sendTextMessage() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 "input_mode": "text",
-                'prompt': inputValue,
+                'question': inputValue,
                 'voice_id': voiceId,
                 'voice_speed': ""
             }),
