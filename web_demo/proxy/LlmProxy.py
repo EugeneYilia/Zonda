@@ -13,7 +13,7 @@ async def fetch_llm_stream_async(message: str):
     返回:
         str: 去除 <think> 思考部分后的真实回答文本
     """
-    url = "http://localhost:8000/ask"
+    url = "http://localhost:8008/ask"
     headers = {
         "Content-Type": "application/json",
         "Accept": "text/plain"
