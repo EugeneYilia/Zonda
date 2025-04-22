@@ -77,7 +77,7 @@ logger = logging.getLogger(__name__)
 
 async def get_audio(text, voice_speed, voice_id):
     logger.info(f"text: {text} voice_speed: {voice_speed}  voice_id: {voice_id}")
-    url = "http://127.0.0.1:8118/tts"
+    url = "http://127.0.0.1:8189/synthesize"
     payload = {
         "text": text,
         "voice_id": voice_id
