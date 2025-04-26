@@ -405,8 +405,14 @@ async function setupVertsBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objData.vertices), gl.STATIC_DRAW);
 }
 
+let defaultAssetsDir = "static/assets3"
 async function newVideoTask() {
-    await videoProcessor.init("static/assets/01.mp4", "static/assets/combined_data.json.gz");
+    const characterDropdown = window.parent.document.getElementById('characterDropdown');
+    if (characterDropdown) {
+        defaultAssetsDir = characterDropdown.value;
+    }
+
+    await videoProcessor.init(`${defaultAssetsDir}/01.mp4`, `${defaultAssetsDir}/combined_data.json.gz`);
     // 加载 combined_data.json.gz
     await loadCombinedData();
     await init_gl();
