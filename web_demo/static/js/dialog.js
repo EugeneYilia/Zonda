@@ -427,6 +427,14 @@ function user_abort() {
     isPlaying = false; // 标记音频播放结束
     isChatting = false;
     sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>'; // 发送图标
+
+    if (loadingBubble) {
+        loadingBubble.parentElement.remove(); // 移除正在思考中的气泡
+        loadingBubble = null; // 重置引用
+    }
+
+    // 添加一个新的气泡提示对话中止
+    addMessage('<i>已结束当前回复～有啥新问题尽管来找我呀！(๑•̀ㅂ•́)و✧</i>', false, true); // 你可以换成你想要的提示文字
 }
 
 // 播放音频
