@@ -241,8 +241,8 @@ if __name__ == "__main__":
                 port=8898,
                 reload=SystemConfig.is_dev_mode,
                 log_config="web_demo/log_config.yml",
-                ssl_certfile="https/cert.pem",
-                ssl_keyfile="https/privkey.pem"
+                ssl_certfile="web_demo/https/cert.pem",
+                ssl_keyfile="web_demo/https/privkey.pem"
             )
         else:
             uvicorn.run(
