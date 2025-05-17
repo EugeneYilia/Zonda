@@ -33,4 +33,6 @@ httpx
 torch==2.3.0+cu121
 torchaudio==2.3.0
 
+# ========== TTS ==========
+edge-tts
 
