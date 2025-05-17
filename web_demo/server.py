@@ -242,7 +242,7 @@ if __name__ == "__main__":
                 reload=SystemConfig.is_dev_mode,
                 log_config="web_demo/log_config.yml",
                 ssl_certfile="https/cert.pem",
-                ssl_keyfile="https/key.pem"
+                ssl_keyfile="https/privkey.pem"
             )
         else:
             uvicorn.run(
