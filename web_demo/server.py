@@ -234,10 +234,21 @@ if __name__ == "__main__":
             log_config="web_demo/log_config.yml"
         )
     else:
-        uvicorn.run(
-            app,
-            host="0.0.0.0",
-            port=8898,
-            reload=SystemConfig.is_dev_mode,
-            log_config="web_demo/log_config.yml"
-        )
+        if SystemConfig.use_https:
+            uvicorn.run(
+                app,
+                host="0.0.0.0",
+                port=8898,
+                reload=SystemConfig.is_dev_mode,
+                log_config="web_demo/log_config.yml",
+                ssl_certfile="https/cert.pem",
+                ssl_keyfile="https/key.pem"
+            )
+        else:
+            uvicorn.run(
+                app,
+                host="0.0.0.0",
+                port=8898,
+                reload=SystemConfig.is_dev_mode,
+                log_config="web_demo/log_config.yml"
+            )
