@@ -515,6 +515,12 @@ ws.onmessage = (event) => {
         audioQueue.push(audioUint8Array); // 将 Uint8Array 推入队列
         isEnding = content.endpoint;
 
+        if (!audioContext || audioContext.state === 'closed') {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } else if (audioContext.state === 'suspended') {
+            audioContext.resume(); // 如果处于暂停状态，则恢复
+        }
+
         playAudio(); // 播放音频
     }
 };
