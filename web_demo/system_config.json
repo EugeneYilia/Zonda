@@ -2,5 +2,5 @@
   "is_use_gpu" : true,
   "is_dev_mode": false,
   "use_local_tts": false,
-  "use_https": true
+  "use_https": false
 }

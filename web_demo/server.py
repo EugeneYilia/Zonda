@@ -18,6 +18,10 @@ from web_demo.tils.MDUtils import clean_markdown
 import colorama
 colorama.just_fix_windows_console()
 
+from fastapi import WebSocket, WebSocketDisconnect
+from typing import Set
+
+connected_clients: Set[WebSocket] = set()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -133,7 +137,7 @@ def split_sentence(sentence, min_length=10):
 #         chunk = {"text": sub_text, "audio": base64_string, "endpoint": index_ == len(sentences) - 1}
 #         yield f"{json.dumps(chunk)}\n"  # 使用换行符分隔 JSON 块
 
-async def gen_stream(question, asr=False, voice_speed=None, voice_id=None):
+async def gen_stream(question, asr=False, voice_speed=None, voice_id=None, is_local_test=False):
     logger.info(f"gen_stream  question: {question}  voice_speed: {voice_speed}   voice_id: {voice_id}")
 
     if asr:
@@ -171,8 +175,16 @@ async def gen_stream(question, asr=False, voice_speed=None, voice_id=None):
         except Exception as e:
             logger.exception(f"get_audio failed at idx={idx}: {e}")
             base64_string = ""
-        chunk = {"text": text, "audio": base64_string, "endpoint": is_end}
+        chunk = {"text": text, "audio": base64_string, "endpoint": is_end, "is_user": False}
         yield f"{json.dumps(chunk)}\n"
+
+        if not is_local_test:
+            # 2. 推送给所有 WebSocket 连接
+            for client in connected_clients.copy():
+                try:
+                    await client.send_text(json.dumps(chunk))
+                except Exception:
+                    logging.info(f"websocket push failed: {e.message}")
 
 # 处理 ASR 和 TTS 的端点
 @app.post("/process_audio")
@@ -196,6 +208,7 @@ async def eb_stream(request: Request):
         input_mode = body.get("input_mode")
         voice_speed = body.get("voice_speed")
         voice_id = body.get("voice_id")
+        is_local_test = body.get("is_local_test")
 
         if input_mode == "audio":
             base64_audio = body.get("audio")
@@ -208,7 +221,17 @@ async def eb_stream(request: Request):
         elif input_mode == "text":
             question = body.get("question")
             logger.info(f"User text input: {question}")
-            return StreamingResponse(gen_stream(question, asr=False, voice_speed=voice_speed, voice_id=voice_id),
+
+            if not is_local_test:
+                # Websocket push
+                for client in connected_clients:
+                    try:
+                        await client.send_text(json.dumps({"is_user": True, "text": question, "audio": "", "endpoint":""}))
+
+                    except Exception as e:
+                        print("发送失败，跳过")
+
+            return StreamingResponse(gen_stream(question, asr=False, voice_speed=voice_speed, voice_id=voice_id, is_local_test=is_local_test),
                                      media_type="application/json")
         else:
             raise HTTPException(status_code=400, detail="Invalid input mode")
@@ -220,6 +243,19 @@ async def eb_stream(request: Request):
 async def read_root():
     return FileResponse("web_demo/static/Yuri.html", media_type="text/html")
 
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    connected_clients.add(websocket)
+    print("客户端已连接")
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print(f"收到消息: {data}")
+            await websocket.send_text(f"你说的是：{data}")
+    except WebSocketDisconnect:
+        print("客户端断开连接")
 
 # 启动Uvicorn服务器
 if __name__ == "__main__":

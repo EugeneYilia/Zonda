@@ -244,7 +244,8 @@ function sendTextMessage() {
                 "input_mode": "text",
                 'question': inputValue,
                 'voice_id': voiceId,
-                'voice_speed': ""
+                'voice_speed': "",
+                'is_local_test': true
             }),
             signal: controller.signal
         })
@@ -487,3 +488,43 @@ document.querySelector('.chat-container').addEventListener('touchmove', (e) => {
 }, { passive: true });
 
 voiceInputArea.style.pointerEvents = 'none'; // 禁止点击穿透
+
+
+const ws = new WebSocket("ws://localhost:8898/ws");
+
+ws.onopen = () => {
+  console.log("WebSocket 已连接");
+};
+
+is_websokcet_fiest_system_response = false
+
+ws.onmessage = (event) => {
+  console.log("收到消息:", event.data);
+  var content = JSON.parse(event.data);
+
+  addMessage(content.text, content.is_user, content.is_user ? true : is_websokcet_fiest_system_response);
+  if (content.is_user){
+      is_websokcet_fiest_system_response = true
+  } else {
+      is_websokcet_fiest_system_response = false
+  }
+
+  // 将 Base64 音频数据转换为 Uint8Array
+    if(!content.is_user) {
+        const audioUint8Array = base64ToUint8Array(content.audio);
+        audioQueue.push(audioUint8Array); // 将 Uint8Array 推入队列
+        isEnding = content.endpoint;
+
+        playAudio(); // 播放音频
+    }
+};
+
+ws.onclose = () => {
+  console.log("WebSocket 已关闭");
+};
+
+function sendMessage() {
+  const input = document.getElementById("msgInput");
+  const message = input.value;
+  ws.send(message);
+}
