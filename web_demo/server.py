@@ -140,6 +140,26 @@ def split_sentence(sentence, min_length=10):
 async def gen_stream(question, asr=False, voice_speed=None, voice_id=None, is_local_test=False):
     logger.info(f"gen_stream  question: {question}  voice_speed: {voice_speed}   voice_id: {voice_id}")
 
+    if "进入直播间" in question:
+        if SystemConfig.use_local_tts:
+            response = {"text": question, "audio": await get_audio(question, voice_speed, voice_id), "endpoint": True, "is_user": False}
+        else:
+            response = {"text": question, "audio": await get_audio_by_edge_tts(question, voice_speed, voice_id), "endpoint": True, "is_user": False}
+
+        response_text = f"{json.dumps(response)}\n"
+        logger.info("欢迎流程: " + response_text)
+        yield response_text
+        if not is_local_test:
+            # 2. 推送给所有 WebSocket 连接
+            for client in connected_clients.copy():
+                try:
+                    await client.send_text(response_text)
+                except Exception as e:
+                    logging.info(f"websocket push failed: {e.message}")
+        return
+
+    logger.info("正式流程")
+
     if asr:
         chunk = {"question": question}
         yield f"{json.dumps(chunk)}\n"
@@ -183,8 +203,8 @@ async def gen_stream(question, asr=False, voice_speed=None, voice_id=None, is_lo
             for client in connected_clients.copy():
                 try:
                     await client.send_text(json.dumps(chunk))
-                except Exception:
-                    logging.info(f"websocket push failed: {e.message}")
+                except Exception as ex:
+                    logging.info(f"websocket push failed: {ex.message}")
 
 # 处理 ASR 和 TTS 的端点
 @app.post("/process_audio")
@@ -226,7 +246,7 @@ async def eb_stream(request: Request):
                 # Websocket push
                 for client in connected_clients:
                     try:
-                        if not "进入了直播间" in question:
+                        if not "进入直播间" in question:
                             await client.send_text(json.dumps({"is_user": True, "text": question, "audio": "", "endpoint":""}))
 
                     except Exception as e:
