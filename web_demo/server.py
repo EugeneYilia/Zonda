@@ -170,6 +170,9 @@ async def gen_stream(question, asr=False, voice_speed=None, voice_id=None, is_lo
 
     async for llm_response in fetch_llm_stream_async(question):
         logger.info(f"gen_stream   llm_response: {llm_response}")
+        if "资料未提及" in llm_response:
+            llm_response = llm_response.replace("资料未提及", f"对于{question}这个问题,我还得再想想")
+
         is_answer_end = False
         if llm_response.endswith("[Heil Hitler!]"):
             llm_response = llm_response.removesuffix("[Heil Hitler!]")
@@ -204,7 +207,7 @@ async def gen_stream(question, asr=False, voice_speed=None, voice_id=None, is_lo
                 try:
                     await client.send_text(json.dumps(chunk))
                 except Exception as ex:
-                    logging.info(f"websocket push failed: {ex.message}")
+                    logging.info(f"websocket push failed: {ex}")
 
 # 处理 ASR 和 TTS 的端点
 @app.post("/process_audio")
