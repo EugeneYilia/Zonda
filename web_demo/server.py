@@ -226,7 +226,8 @@ async def eb_stream(request: Request):
                 # Websocket push
                 for client in connected_clients:
                     try:
-                        await client.send_text(json.dumps({"is_user": True, "text": question, "audio": "", "endpoint":""}))
+                        if not "进入了直播间" in question:
+                            await client.send_text(json.dumps({"is_user": True, "text": question, "audio": "", "endpoint":""}))
 
                     except Exception as e:
                         print("发送失败，跳过")
