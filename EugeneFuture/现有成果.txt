@@ -21,7 +21,7 @@ https://chatgpt.com/g/g-67dd94e4f69c8191b1f4dbc192666d70-ji-an-zhi-neng-ti
 
 
 ngrok启动方式
-ngrok start --all --config "C:\Users\yichenliu\JiAn\AiProjects\DH_live\EugeneFuture\ngrok.yml"
+ngrok start --all --config "E:\CapitalEugene\AI\DigitalHuman\DH_Live\EugeneFuture\ngrok.yml"
 
 
 
