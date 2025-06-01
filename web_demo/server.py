@@ -310,7 +310,7 @@ def start_scheduler_loop():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     scheduler = BackgroundScheduler()
-    scheduler.add_job(job_wrapper, 'interval', seconds=5)
+    scheduler.add_job(job_wrapper, 'interval', seconds=60 * 3)
     scheduler.start()
     try:
         loop.run_forever()
