@@ -490,7 +490,7 @@ document.querySelector('.chat-container').addEventListener('touchmove', (e) => {
 voiceInputArea.style.pointerEvents = 'none'; // 禁止点击穿透
 
 
-const ws = new WebSocket("ws://localhost:8898/ws");
+const ws = new WebSocket("ws://localhost/ws");
 
 ws.onopen = () => {
   console.log("WebSocket 已连接");

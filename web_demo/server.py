@@ -289,7 +289,7 @@ if __name__ == "__main__":
         uvicorn.run(
             "web_demo.server:app",
             host="0.0.0.0",
-            port=8898,
+            port=80,
             reload=SystemConfig.is_dev_mode,
             log_config="web_demo/log_config.yml"
         )
@@ -298,7 +298,7 @@ if __name__ == "__main__":
             uvicorn.run(
                 app,
                 host="0.0.0.0",
-                port=8898,
+                port=443,
                 reload=SystemConfig.is_dev_mode,
                 log_config="web_demo/log_config.yml",
                 ssl_certfile="web_demo/https/cert.pem",
@@ -308,7 +308,7 @@ if __name__ == "__main__":
             uvicorn.run(
                 app,
                 host="0.0.0.0",
-                port=8898,
+                port=80,
                 reload=SystemConfig.is_dev_mode,
                 log_config="web_demo/log_config.yml"
             )
