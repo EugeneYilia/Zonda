@@ -301,7 +301,9 @@ def job_wrapper():
 
 async def test():
     result = await get_audio(SystemConfig.default_speech, "", "male")
-    print(result)
+    with open('speech_voice.txt', 'w', encoding='utf-8') as f:
+        f.write(result)
+    # print(result)
 
 def start_scheduler_loop():
     global loop
