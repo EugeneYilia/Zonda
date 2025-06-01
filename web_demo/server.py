@@ -299,9 +299,9 @@ def job_wrapper():
     global loop
     asyncio.run_coroutine_threadsafe(async_job(), loop)
 
-# async def test():
-#     result = await get_audio(SystemConfig.default_speech, "", "male")
-#     print(result)
+async def test():
+    result = await get_audio(SystemConfig.default_speech, "", "male")
+    print(result)
 
 def start_scheduler_loop():
     global loop
