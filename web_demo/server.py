@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import asyncio
+import threading
 import time
 
 from contextlib import asynccontextmanager
@@ -20,6 +21,8 @@ colorama.just_fix_windows_console()
 
 from fastapi import WebSocket, WebSocketDisconnect
 from typing import Set
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 connected_clients: Set[WebSocket] = set()
 
@@ -251,7 +254,6 @@ async def eb_stream(request: Request):
                     try:
                         if not "进入直播间" in question:
                             await client.send_text(json.dumps({"is_user": True, "text": question, "audio": "", "endpoint":""}))
-
                     except Exception as e:
                         print("发送失败，跳过")
 
@@ -281,9 +283,45 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         print("客户端断开连接")
 
+
+async def async_job():
+    logger.info("connected_clients size:{}".format(len(connected_clients)))
+    for client in connected_clients:
+        try:
+            await client.send_text(json.dumps({"is_user": False, "text": "", "audio": SystemConfig.default_voice, "endpoint": True, "default_speech": True}))
+        except Exception as e:
+            logger.warning(f"发送失败: {e}")
+
+
+loop = None
+
+def job_wrapper():
+    global loop
+    asyncio.run_coroutine_threadsafe(async_job(), loop)
+
+# async def test():
+#     result = await get_audio(SystemConfig.default_speech, "", "male")
+#     print(result)
+
+def start_scheduler_loop():
+    global loop
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(job_wrapper, 'interval', seconds=5)
+    scheduler.start()
+    try:
+        loop.run_forever()
+    finally:
+        scheduler.shutdown()
+
 # 启动Uvicorn服务器
 if __name__ == "__main__":
     import uvicorn
+    # asyncio.run(test())
+
+    t = threading.Thread(target=start_scheduler_loop, daemon=True)
+    t.start()
 
     if SystemConfig.is_dev_mode:
         uvicorn.run(

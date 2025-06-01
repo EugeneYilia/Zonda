@@ -490,7 +490,7 @@ document.querySelector('.chat-container').addEventListener('touchmove', (e) => {
 voiceInputArea.style.pointerEvents = 'none'; // 禁止点击穿透
 
 
-const ws = new WebSocket(`wss://${location.host}/ws`);
+const ws = new WebSocket(`ws://${location.host}/ws`);
 
 ws.onopen = () => {
   console.log("WebSocket 已连接");
@@ -502,7 +502,10 @@ ws.onmessage = (event) => {
   console.log("收到消息:", event.data);
   var content = JSON.parse(event.data);
 
-  addMessage(content.text, content.is_user, content.is_user ? true : content.text.includes("进入直播间") ? true : is_websokcet_fiest_system_response);
+  if((content["default_speech"] ?? false) === false){
+    addMessage(content.text, content.is_user, content.is_user ? true : content.text.includes("进入直播间") ? true : is_websokcet_fiest_system_response)
+  }
+
   if (content.is_user){
       is_websokcet_fiest_system_response = true
   } else {

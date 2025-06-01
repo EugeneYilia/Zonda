@@ -36,3 +36,6 @@ torchaudio==2.3.0
 # ========== TTS ==========
 edge-tts
 
+
+# ========== Scheduler ==========
+apscheduler

@@ -11,3 +11,4 @@ pydub
 colorama
 colorlog
 httpx
+apscheduler
